@@ -22,6 +22,8 @@ jobs:
       - run: npm run test:engine
       - run: npm run test:assets
       - run: npm run test:overrides
+      - run: npm run test:templates
+      - run: npm run check:brand-assets
       - run: npm run engine:validate
       - run: npm run engine:compile
       - run: npm run engine:build

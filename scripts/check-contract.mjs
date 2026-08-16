@@ -96,7 +96,8 @@ const [
   offlineCheck,
   viteConfig,
   templateVisualQa,
-  templateVisualInspectionText
+  templateVisualInspectionText,
+  ciWorkflow
 ] = await Promise.all([
   read(".agents/skills/cosco-report/SKILL.md"),
   read(".agents/skills/cosco-report/references/prompt-modify-specialized-report.md"),
@@ -107,7 +108,8 @@ const [
   read("scripts/check-offline.mjs"),
   read("vite.config.ts"),
   read("scripts/template-visual-qa.mjs"),
-  read("artifacts/template-visual-qa/inspection.json")
+  read("artifacts/template-visual-qa/inspection.json"),
+  read(".github/workflows/ci.yml")
 ]);
 
 const version = versionText.trim();
@@ -178,6 +180,7 @@ requireCondition(brandAssets.includes("?inline") && brandAssets.includes("logoCo
 requireCondition(brandScript.includes("metadata.hasAlpha") && brandScript.includes("cornerAlpha") && brandScript.includes("EXPECTED") && brandScript.includes("与固化尺寸、字节数或 SHA-256 不一致"), "品牌资源脚本没有验证透明 PNG 或固化尺寸、字节数和哈希");
 requireCondition(coverNotice.includes("Public domain") && coverNotice.includes("CC0 1.0") && coverNotice.includes("Wikimedia Commons"), "封面起始图缺少可再分发来源说明");
 requireCondition(packageJson.scripts["qa:templates"] === "node scripts/template-visual-qa.mjs" && packageJson.scripts["verify:release"].includes("qa:templates") && manifest.requiredChecks?.includes("qa:templates"), "发布门禁没有包含全模板视觉矩阵");
+requireCondition(ciWorkflow.includes("npm run test:templates") && ciWorkflow.includes("npm run check:brand-assets") && ciWorkflow.includes("npm run check:contract"), "GitHub CI 没有执行模板、品牌资产和发布契约检查");
 requireCondition(templateVisualQa.includes("COVER_TEMPLATES") && templateVisualQa.includes("CHROME_TEMPLATES") && templateVisualQa.includes("template-matrix.pdf") && templateVisualQa.includes("--expected-document"), "模板视觉矩阵没有覆盖全部模板或真实 PDF 逐页检查");
 requireCondition(templateVisualInspection.pages === 16 && !templateVisualInspection.errors?.length && !templateVisualInspection.warnings?.length && templateVisualInspection.pageSizes?.every((page) => page.a4Matched && page.expectedOrientation === page.actualOrientation), "模板视觉矩阵检查结果不是 16 页零错误零警告的横竖 A4");
 
