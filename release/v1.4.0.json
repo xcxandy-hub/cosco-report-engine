@@ -1,0 +1,24 @@
+{
+  "product": "Local Report Studio",
+  "applicationVersion": "1.4.0",
+  "documentSchemaVersion": "1.4",
+  "releaseDate": "2026-08-15",
+  "status": "frozen-baseline",
+  "entry": "dist/index.html",
+  "byteSize": 1491148,
+  "sha256": "9e65487b292de6c59be18cafff12aad9e9ea368fda7b8a9c78d8ad4b1f2d709d",
+  "featureBaseline": "docs/feature-baseline-v1.4.0.md",
+  "contract": "docs/contracts-v1.4.0.md",
+  "research": [
+    "docs/online-editor-research-v1.4.md",
+    "docs/institutional-report-design-study-v1.4.md"
+  ],
+  "requiredChecks": [
+    "typecheck",
+    "test:migration",
+    "build",
+    "check:offline",
+    "check:contract",
+    "qa:visual"
+  ]
+}

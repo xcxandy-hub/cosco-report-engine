@@ -1,0 +1,12 @@
+node_modules/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+.DS_Store
+tmp/
+artifacts/rendered/
+artifacts/visual-qa/
+artifacts/通用本地报告生成器-*.pdf
+artifacts/fixtures/
+artifacts/finance-brief/rendered/page-*.png
+artifacts/finance-brief/rendered/extracted-text.txt

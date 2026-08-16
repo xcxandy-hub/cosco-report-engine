@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run test:migration
+      - run: npm run test:engine
+      - run: npm run test:assets
+      - run: npm run test:overrides
+      - run: npm run engine:validate
+      - run: npm run engine:compile
+      - run: npm run engine:build
+      - run: npm run check:offline
+      - run: npm run check:engine-html
+      - run: npm run check:contract

@@ -1,0 +1,43 @@
+{
+  "product": "Local Report Studio",
+  "applicationVersion": "1.5.0",
+  "documentSchemaVersion": "1.4",
+  "reportEngineVersion": "0.1",
+  "releaseDate": "2026-08-15",
+  "status": "frozen-baseline",
+  "entry": "dist/index.html",
+  "byteSize": 1549087,
+  "sha256": "a969dcfe8b361fc9335fe49bc199eea1e123f71948a597a6009ce0e363eedde1",
+  "referenceGenerator": {
+    "entry": "artifacts/finance-brief/finance-brief-generator.html",
+    "byteSize": 1602431,
+    "sha256": "1f5874c638a0749ff744f1da88fdf79536e5da48e80af47235c6624c4499395c"
+  },
+  "referencePdf": {
+    "entry": "artifacts/finance-brief/finance-brief.pdf",
+    "pages": 10,
+    "byteSize": 674045,
+    "sha256": "7af7ddc288bdd5347effaf4bc4f4c1ffadf6d62b48e60593cebbfd6f67a189ec"
+  },
+  "featureBaseline": "docs/feature-baseline-v1.5.0.md",
+  "contract": "docs/contracts-v1.5.0.md",
+  "research": [
+    "docs/github-skill-research.md",
+    "docs/online-editor-research-v1.4.md",
+    "docs/institutional-report-design-study-v1.4.md"
+  ],
+  "requiredChecks": [
+    "typecheck",
+    "test:migration",
+    "test:engine",
+    "engine:validate",
+    "engine:build",
+    "check:offline",
+    "check:engine-html",
+    "check:contract",
+    "qa:visual",
+    "engine:pdf",
+    "test:pdf-determinism",
+    "engine:inspect-pdf"
+  ]
+}

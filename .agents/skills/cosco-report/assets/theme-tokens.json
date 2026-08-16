@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "name": "本地企业报告主题",
+  "disclaimer": "本主题是项目默认值，不代表公司正式品牌手册。",
+  "colors": {
+    "primary": "#174f78",
+    "secondary": "#dce9f1",
+    "accent": "#d24a3a",
+    "text": "#20262b",
+    "muted": "#6a747b",
+    "paper": "#ffffff",
+    "surface": "#f3f6f7",
+    "line": "#cbd3d8",
+    "positive": "#2f7651",
+    "negative": "#b23a3f",
+    "white": "#ffffff",
+    "transparent": "transparent"
+  },
+  "fontSlots": {
+    "display": "PingFang SC, Microsoft YaHei, Arial, sans-serif",
+    "body": "PingFang SC, Microsoft YaHei, Arial, sans-serif",
+    "numeric": "Arial, DIN Alternate, PingFang SC, sans-serif"
+  },
+  "fontSizePt": [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40, 48],
+  "lineHeight": [1.2, 1.35, 1.5],
+  "chartPalette": [
+    "#174f78",
+    "#4f89aa",
+    "#94afbf",
+    "#d24a3a",
+    "#6a765f",
+    "#9b7b52"
+  ],
+  "spacingMm": {
+    "pageSafety": 12.7,
+    "contentMinimum": 7.6,
+    "grid": [2.5, 5, 10]
+  },
+  "imageStyleDefaults": {
+    "overlayKind": "linear",
+    "overlayColor": "primary",
+    "overlayColor2": "transparent",
+    "overlayAngle": 0,
+    "blendMode": "multiply",
+    "strength": 0.72,
+    "grade": "none",
+    "vignette": "light"
+  },
+  "print": {
+    "dpi": [96, 150, 300],
+    "minimumImageDpi": 150,
+    "defaultDpi": 300
+  }
+}

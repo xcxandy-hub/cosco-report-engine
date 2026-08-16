@@ -1,0 +1,52 @@
+{
+  "product": "Local Report Studio",
+  "applicationVersion": "1.6.0",
+  "documentSchemaVersion": "1.5",
+  "reportEngineVersion": "0.1",
+  "releaseDate": "2026-08-15",
+  "status": "release-candidate",
+  "entry": "dist/index.html",
+  "byteSize": 1584631,
+  "sha256": "ded26ad5b2d22e5e1e2231ca3718ef32e162e70d20961c83754056acc063c520",
+  "referenceGenerator": {
+    "entry": "artifacts/finance-brief/finance-brief-generator.html",
+    "byteSize": 1638015,
+    "sha256": "dbb876e735cef6d40492e84a32cd5adfab2b04f1f9ff525bf8f04285b5306cc0"
+  },
+  "referencePdf": {
+    "entry": "artifacts/finance-brief/finance-brief.pdf",
+    "pageCountSource": "artifacts/finance-brief/document.json",
+    "pageCountScope": "finance-brief-reference-only",
+    "note": "PDF 验收页数从本次编译文档的 pages.length 读取；当前 finance-brief 基线编译为 10 页，但检查器不硬编码 10，也不把它作为报告内核上限。",
+    "byteSize": 673255,
+    "sha256": "3fbbec66fe74a20da3b6a6935fb0c757d93694967c6825872f0f293af45849f9"
+  },
+  "engineLimits": {
+    "maximumPages": null,
+    "pageCountPolicy": "报告包至少一页，不设置固定最大页数；实际容量受浏览器内存、图片体积与打印环境约束。"
+  },
+  "featureBaseline": "docs/feature-baseline-v1.6.0.md",
+  "contract": "docs/contracts-v1.6.0.md",
+  "research": [
+    "docs/github-skill-research.md",
+    "docs/online-editor-research-v1.4.md",
+    "docs/institutional-report-design-study-v1.4.md"
+  ],
+  "requiredChecks": [
+    "typecheck",
+    "test:migration",
+    "test:engine",
+    "test:assets",
+    "test:overrides",
+    "engine:validate",
+    "engine:compile",
+    "engine:build",
+    "check:offline",
+    "check:engine-html",
+    "check:contract",
+    "qa:visual",
+    "engine:pdf",
+    "test:pdf-determinism",
+    "engine:inspect-pdf"
+  ]
+}

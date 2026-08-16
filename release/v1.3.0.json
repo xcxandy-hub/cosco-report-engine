@@ -1,0 +1,19 @@
+{
+  "product": "Local Report Studio",
+  "applicationVersion": "1.3.0",
+  "documentSchemaVersion": "1.3",
+  "releaseDate": "2026-08-15",
+  "status": "frozen-baseline",
+  "entry": "dist/index.html",
+  "byteSize": 1475332,
+  "sha256": "956ccd1dacc9046188c724e9cff2a45e8ced703ff17ec7e4350da81bd9bb2fe2",
+  "featureBaseline": "docs/feature-baseline-v1.3.0.md",
+  "contract": "docs/contracts-v1.3.0.md",
+  "requiredChecks": [
+    "typecheck",
+    "build",
+    "check:offline",
+    "check:contract",
+    "qa:visual"
+  ]
+}

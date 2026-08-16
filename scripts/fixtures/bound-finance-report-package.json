@@ -1,0 +1,3536 @@
+{
+  "engineVersion": "0.1",
+  "id": "finance-brief-reference",
+  "version": "1.0.0",
+  "documentUpdatedAt": "2026-08-15T00:00:00.000Z",
+  "dataSchemaVersion": "1.0.0",
+  "name": "财务分析简报参考实现",
+  "description": "以旧版财务简报的业务闭环为行为参考，以 ReportDocument 1.5 为渲染出口；当前页数仅属于本参考报告包。",
+  "meta": {
+    "title": "{{report.organization}}财务分析简报",
+    "organization": "{{report.organization}}",
+    "period": "{{report.period}}",
+    "author": "{{report.author}}",
+    "confidentiality": "{{report.confidentiality}}"
+  },
+  "theme": {
+    "id": "finance-boardroom",
+    "name": "财务简报蓝",
+    "primary": "#174f78",
+    "secondary": "#dce9f1",
+    "accent": "#d24a3a",
+    "text": "#15232d",
+    "muted": "#65747d",
+    "paper": "#fbfcfd",
+    "surface": "#eef3f6",
+    "line": "#c7d2d9",
+    "positive": "#267052",
+    "negative": "#b43a42",
+    "chartPalette": [
+      "#174f78",
+      "#4f89aa",
+      "#94afbf",
+      "#d24a3a",
+      "#6a765f",
+      "#9b7b52"
+    ],
+    "fontFamily": "\"PingFang SC\", \"Microsoft YaHei\", Arial, sans-serif",
+    "fontSlots": {
+      "display": "\"PingFang SC\", \"Microsoft YaHei\", Arial, sans-serif",
+      "body": "\"PingFang SC\", \"Microsoft YaHei\", Arial, sans-serif",
+      "numeric": "\"SF Pro Display\", \"Helvetica Neue\", Arial, sans-serif"
+    }
+  },
+  "pageSetup": {
+    "grid": 5,
+    "margin": 18,
+    "snap": true,
+    "showGrid": false,
+    "footerMode": "all",
+    "printDpi": 300
+  },
+  "fields": {
+    "report.organization": {
+      "label": "机构名称",
+      "type": "text",
+      "required": true
+    },
+    "report.period": {
+      "label": "报告期间",
+      "type": "text",
+      "required": true
+    },
+    "report.author": {
+      "label": "编制人",
+      "type": "text",
+      "required": true
+    },
+    "report.confidentiality": {
+      "label": "密级",
+      "type": "text",
+      "required": true
+    },
+    "report.source": {
+      "label": "资料来源",
+      "type": "text",
+      "required": true,
+      "preview": "本地财务系统（示例）"
+    },
+    "months": {
+      "label": "月度标签",
+      "type": "string[]",
+      "required": true
+    },
+    "metrics.revenue.monthly": {
+      "label": "营业收入月度值",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "allowNegative": false,
+      "preview": [
+        180,
+        183,
+        188,
+        192,
+        198,
+        204,
+        216
+      ]
+    },
+    "metrics.revenue.priorCurrent": {
+      "label": "营业收入上年同期",
+      "type": "number",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "allowNegative": false,
+      "preview": 190
+    },
+    "metrics.cost.monthly": {
+      "label": "总成本月度值",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "allowNegative": false,
+      "preview": [
+        163,
+        165,
+        169,
+        171,
+        174,
+        178,
+        185
+      ]
+    },
+    "metrics.cost.priorCurrent": {
+      "label": "总成本上年同期",
+      "type": "number",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "allowNegative": false,
+      "preview": 170
+    },
+    "metrics.profit.monthly": {
+      "label": "利润总额月度值",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "preview": [
+        17,
+        18,
+        19,
+        21,
+        24,
+        26,
+        31
+      ]
+    },
+    "metrics.profit.priorCurrent": {
+      "label": "利润总额上年同期",
+      "type": "number",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "preview": 24
+    },
+    "metrics.volume.monthly": {
+      "label": "提单箱量月度值",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "万TEU",
+      "allowNegative": false,
+      "preview": [
+        183,
+        185,
+        188,
+        191,
+        194,
+        198,
+        201
+      ]
+    },
+    "metrics.volume.priorCurrent": {
+      "label": "提单箱量上年同期",
+      "type": "number",
+      "required": true,
+      "sensitive": true,
+      "unit": "万TEU",
+      "allowNegative": false,
+      "preview": 190
+    },
+    "metrics.cashflow.monthly": {
+      "label": "经营现金流月度值",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "preview": [
+        28,
+        33,
+        36,
+        34,
+        38,
+        41,
+        44
+      ]
+    },
+    "metrics.management.monthly": {
+      "label": "管理费用月度值",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "allowNegative": false,
+      "preview": [
+        1.9,
+        1.8,
+        2,
+        2,
+        2.1,
+        2.1,
+        2.2
+      ]
+    },
+    "metrics.finance.monthly": {
+      "label": "财务费用月度值",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "preview": [
+        2.5,
+        2.4,
+        2.5,
+        2.6,
+        2.7,
+        2.7,
+        2.8
+      ]
+    },
+    "revenueTypes.labels": {
+      "label": "收入类型名称",
+      "type": "string[]",
+      "required": true
+    },
+    "revenueTypes.current": {
+      "label": "收入类型报告月值",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "allowNegative": false,
+      "preview": [
+        177,
+        17,
+        13,
+        9
+      ]
+    },
+    "trade.labels": {
+      "label": "贸易区名称",
+      "type": "string[]",
+      "required": true
+    },
+    "trade.revenueCurrent": {
+      "label": "贸易区收入",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "allowNegative": false,
+      "preview": [
+        58,
+        52,
+        45,
+        35,
+        26
+      ]
+    },
+    "trade.volumeCurrent": {
+      "label": "贸易区箱量",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "万TEU",
+      "allowNegative": false,
+      "preview": [
+        48,
+        46,
+        44,
+        34,
+        29
+      ]
+    },
+    "freight.america": {
+      "label": "美洲单箱收入趋势",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "USD/TEU",
+      "allowNegative": false,
+      "preview": [
+        2360,
+        2390,
+        2410,
+        2450,
+        2480,
+        2520,
+        2580
+      ]
+    },
+    "freight.europe": {
+      "label": "欧洲单箱收入趋势",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "USD/TEU",
+      "allowNegative": false,
+      "preview": [
+        2180,
+        2200,
+        2230,
+        2260,
+        2310,
+        2350,
+        2390
+      ]
+    },
+    "freight.asia": {
+      "label": "亚太单箱收入趋势",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "USD/TEU",
+      "allowNegative": false,
+      "preview": [
+        1420,
+        1430,
+        1450,
+        1470,
+        1490,
+        1510,
+        1530
+      ]
+    },
+    "cost.labels": {
+      "label": "成本项目名称",
+      "type": "string[]",
+      "required": true
+    },
+    "cost.current": {
+      "label": "成本项目报告月值",
+      "type": "number[]",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "allowNegative": false,
+      "preview": [
+        46,
+        20,
+        18,
+        15,
+        6,
+        37,
+        17,
+        13,
+        13
+      ]
+    },
+    "finance.labels": {
+      "label": "费用项目名称",
+      "type": "string[]",
+      "required": true
+    },
+    "finance.scope": {
+      "label": "费用数据口径",
+      "type": "string[]",
+      "required": true
+    },
+    "financeComponents.interestExpense": {
+      "label": "利息支出",
+      "type": "number",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "preview": 2.8
+    },
+    "financeComponents.interestIncome": {
+      "label": "利息收入",
+      "type": "number",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "preview": -1.2
+    },
+    "financeComponents.fx": {
+      "label": "汇兑损益",
+      "type": "number",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "preview": 0.4
+    },
+    "financeComponents.other": {
+      "label": "其他财务费用",
+      "type": "number",
+      "required": true,
+      "sensitive": true,
+      "unit": "亿元",
+      "preview": 0.8
+    },
+    "history.headers": {
+      "label": "历史表头",
+      "type": "string[]",
+      "required": true
+    },
+    "history.priorRows": {
+      "label": "前三年历史指标",
+      "type": "table",
+      "required": true,
+      "sensitive": true,
+      "preview": [
+        [
+          "营业收入(亿元)",
+          "1038.0",
+          "1105.0",
+          "1163.0"
+        ],
+        [
+          "利润总额(亿元)",
+          "104.0",
+          "112.0",
+          "117.0"
+        ],
+        [
+          "提单箱量(万TEU)",
+          "1130",
+          "1170",
+          "1222"
+        ],
+        [
+          "单箱收入(元/TEU)",
+          "8900",
+          "9200",
+          "9524"
+        ],
+        [
+          "资产负债率(%)",
+          "58.6",
+          "57.9",
+          "56.0"
+        ]
+      ]
+    },
+    "history.currentDebtRatio": {
+      "label": "报告期资产负债率",
+      "type": "number",
+      "required": true,
+      "sensitive": true,
+      "unit": "%",
+      "preview": 54.5
+    },
+    "commentary.overview": {
+      "label": "经营综述",
+      "type": "text",
+      "required": true
+    },
+    "commentary.drivers": {
+      "label": "影响因素说明",
+      "type": "text",
+      "required": true
+    },
+    "commentary.revenue": {
+      "label": "收入结构说明",
+      "type": "text",
+      "required": true
+    },
+    "commentary.trade": {
+      "label": "贸易区说明",
+      "type": "text",
+      "required": true
+    },
+    "commentary.freight": {
+      "label": "单箱收入说明",
+      "type": "text",
+      "required": true
+    },
+    "commentary.cost": {
+      "label": "成本说明",
+      "type": "text",
+      "required": true
+    },
+    "commentary.finance": {
+      "label": "管理与财务费用说明",
+      "type": "text",
+      "required": true
+    },
+    "commentary.history": {
+      "label": "历史口径说明",
+      "type": "text",
+      "required": true
+    }
+  },
+  "derived": {
+    "metrics.revenue.current": {
+      "expression": {
+        "op": "last",
+        "args": [
+          {
+            "ref": "metrics.revenue.monthly"
+          }
+        ]
+      }
+    },
+    "metrics.cost.current": {
+      "expression": {
+        "op": "last",
+        "args": [
+          {
+            "ref": "metrics.cost.monthly"
+          }
+        ]
+      }
+    },
+    "metrics.profit.current": {
+      "expression": {
+        "op": "last",
+        "args": [
+          {
+            "ref": "metrics.profit.monthly"
+          }
+        ]
+      }
+    },
+    "metrics.volume.current": {
+      "expression": {
+        "op": "last",
+        "args": [
+          {
+            "ref": "metrics.volume.monthly"
+          }
+        ]
+      }
+    },
+    "metrics.cashflow.current": {
+      "expression": {
+        "op": "last",
+        "args": [
+          {
+            "ref": "metrics.cashflow.monthly"
+          }
+        ]
+      }
+    },
+    "metrics.management.current": {
+      "expression": {
+        "op": "last",
+        "args": [
+          {
+            "ref": "metrics.management.monthly"
+          }
+        ]
+      }
+    },
+    "metrics.finance.current": {
+      "expression": {
+        "op": "last",
+        "args": [
+          {
+            "ref": "metrics.finance.monthly"
+          }
+        ]
+      }
+    },
+    "metrics.revenue.yoy": {
+      "expression": {
+        "op": "pctChange",
+        "args": [
+          {
+            "ref": "metrics.revenue.current"
+          },
+          {
+            "ref": "metrics.revenue.priorCurrent"
+          }
+        ]
+      }
+    },
+    "metrics.cost.yoy": {
+      "expression": {
+        "op": "pctChange",
+        "args": [
+          {
+            "ref": "metrics.cost.current"
+          },
+          {
+            "ref": "metrics.cost.priorCurrent"
+          }
+        ]
+      }
+    },
+    "metrics.profit.yoy": {
+      "expression": {
+        "op": "pctChange",
+        "args": [
+          {
+            "ref": "metrics.profit.current"
+          },
+          {
+            "ref": "metrics.profit.priorCurrent"
+          }
+        ]
+      }
+    },
+    "metrics.volume.yoy": {
+      "expression": {
+        "op": "pctChange",
+        "args": [
+          {
+            "ref": "metrics.volume.current"
+          },
+          {
+            "ref": "metrics.volume.priorCurrent"
+          }
+        ]
+      }
+    },
+    "metrics.unitRevenue.monthly": {
+      "expression": {
+        "op": "seriesDivide",
+        "args": [
+          {
+            "ref": "metrics.revenue.monthly"
+          },
+          {
+            "ref": "metrics.volume.monthly"
+          }
+        ],
+        "scale": 10000
+      }
+    },
+    "metrics.unitRevenue.current": {
+      "expression": {
+        "op": "last",
+        "args": [
+          {
+            "ref": "metrics.unitRevenue.monthly"
+          }
+        ]
+      }
+    },
+    "metrics.profit.expected": {
+      "expression": {
+        "op": "subtract",
+        "args": [
+          {
+            "ref": "metrics.revenue.current"
+          },
+          {
+            "ref": "metrics.cost.current"
+          }
+        ]
+      }
+    },
+    "revenueTypes.total": {
+      "expression": {
+        "op": "arraySum",
+        "args": [
+          {
+            "ref": "revenueTypes.current"
+          }
+        ]
+      }
+    },
+    "revenueTypes.shares": {
+      "expression": {
+        "op": "seriesShare",
+        "args": [
+          {
+            "ref": "revenueTypes.current"
+          }
+        ]
+      }
+    },
+    "cost.total": {
+      "expression": {
+        "op": "arraySum",
+        "args": [
+          {
+            "ref": "cost.current"
+          }
+        ]
+      }
+    },
+    "cost.shares": {
+      "expression": {
+        "op": "seriesShare",
+        "args": [
+          {
+            "ref": "cost.current"
+          }
+        ]
+      }
+    },
+    "financeComponents.current": {
+      "expression": {
+        "op": "array",
+        "args": [
+          {
+            "ref": "financeComponents.interestExpense"
+          },
+          {
+            "ref": "financeComponents.interestIncome"
+          },
+          {
+            "ref": "financeComponents.fx"
+          },
+          {
+            "ref": "financeComponents.other"
+          }
+        ]
+      }
+    },
+    "financeComponents.total": {
+      "expression": {
+        "op": "arraySum",
+        "args": [
+          {
+            "ref": "financeComponents.current"
+          }
+        ]
+      }
+    },
+    "trade.unitRevenue": {
+      "expression": {
+        "op": "seriesDivide",
+        "args": [
+          {
+            "ref": "trade.revenueCurrent"
+          },
+          {
+            "ref": "trade.volumeCurrent"
+          }
+        ],
+        "scale": 10000
+      }
+    },
+    "finance.values": {
+      "expression": {
+        "op": "array",
+        "args": [
+          {
+            "ref": "metrics.management.current"
+          },
+          {
+            "ref": "metrics.finance.current"
+          },
+          {
+            "ref": "financeComponents.interestExpense"
+          },
+          {
+            "ref": "financeComponents.interestIncome"
+          },
+          {
+            "ref": "financeComponents.fx"
+          },
+          {
+            "ref": "financeComponents.other"
+          }
+        ]
+      }
+    },
+    "metrics.revenue.cumulative": {
+      "expression": {
+        "op": "arraySum",
+        "args": [
+          {
+            "ref": "metrics.revenue.monthly"
+          }
+        ]
+      }
+    },
+    "metrics.profit.cumulative": {
+      "expression": {
+        "op": "arraySum",
+        "args": [
+          {
+            "ref": "metrics.profit.monthly"
+          }
+        ]
+      }
+    },
+    "metrics.volume.cumulative": {
+      "expression": {
+        "op": "arraySum",
+        "args": [
+          {
+            "ref": "metrics.volume.monthly"
+          }
+        ]
+      }
+    },
+    "metrics.unitRevenue.cumulative": {
+      "expression": {
+        "op": "divide",
+        "args": [
+          {
+            "ref": "metrics.revenue.cumulative"
+          },
+          {
+            "ref": "metrics.volume.cumulative"
+          }
+        ],
+        "scale": 10000
+      }
+    },
+    "metrics.unitRevenue.cumulativeDisplay": {
+      "expression": {
+        "op": "round",
+        "args": [
+          {
+            "ref": "metrics.unitRevenue.cumulative"
+          }
+        ],
+        "digits": 0
+      }
+    },
+    "history.currentValues": {
+      "expression": {
+        "op": "array",
+        "args": [
+          {
+            "ref": "metrics.revenue.cumulative"
+          },
+          {
+            "ref": "metrics.profit.cumulative"
+          },
+          {
+            "ref": "metrics.volume.cumulative"
+          },
+          {
+            "ref": "metrics.unitRevenue.cumulativeDisplay"
+          },
+          {
+            "ref": "history.currentDebtRatio"
+          }
+        ]
+      }
+    },
+    "history.rows": {
+      "expression": {
+        "op": "appendColumns",
+        "args": [
+          {
+            "ref": "history.priorRows"
+          },
+          {
+            "ref": "history.currentValues"
+          }
+        ]
+      }
+    }
+  },
+  "inputSections": [
+    {
+      "id": "report",
+      "title": "报告信息",
+      "fields": [
+        "report.organization",
+        "report.period",
+        "report.author",
+        "report.confidentiality",
+        "report.source",
+        "months"
+      ]
+    },
+    {
+      "id": "metrics",
+      "title": "核心指标",
+      "fields": [
+        "metrics.revenue.monthly",
+        "metrics.revenue.priorCurrent",
+        "metrics.cost.monthly",
+        "metrics.cost.priorCurrent",
+        "metrics.profit.monthly",
+        "metrics.profit.priorCurrent",
+        "metrics.volume.monthly",
+        "metrics.volume.priorCurrent",
+        "metrics.cashflow.monthly",
+        "metrics.management.monthly",
+        "metrics.finance.monthly"
+      ]
+    },
+    {
+      "id": "revenue",
+      "title": "收入结构",
+      "fields": [
+        "revenueTypes.labels",
+        "revenueTypes.current"
+      ]
+    },
+    {
+      "id": "trade",
+      "title": "贸易区与运价",
+      "fields": [
+        "trade.labels",
+        "trade.revenueCurrent",
+        "trade.volumeCurrent",
+        "freight.america",
+        "freight.europe",
+        "freight.asia"
+      ]
+    },
+    {
+      "id": "cost",
+      "title": "成本构成",
+      "fields": [
+        "cost.labels",
+        "cost.current"
+      ]
+    },
+    {
+      "id": "finance",
+      "title": "费用与历史",
+      "fields": [
+        "finance.labels",
+        "finance.scope",
+        "financeComponents.interestExpense",
+        "financeComponents.interestIncome",
+        "financeComponents.fx",
+        "financeComponents.other",
+        "history.headers",
+        "history.priorRows",
+        "history.currentDebtRatio"
+      ]
+    },
+    {
+      "id": "commentary",
+      "title": "文字分析",
+      "fields": [
+        "commentary.overview",
+        "commentary.drivers",
+        "commentary.revenue",
+        "commentary.trade",
+        "commentary.freight",
+        "commentary.cost",
+        "commentary.finance",
+        "commentary.history"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "profit-reconciliation",
+      "severity": "error",
+      "assert": {
+        "op": "approxEq",
+        "args": [
+          {
+            "ref": "metrics.profit.expected"
+          },
+          {
+            "ref": "metrics.profit.current"
+          },
+          0.11
+        ]
+      },
+      "message": "利润勾稽不平：营业收入减总成本与利润总额不一致",
+      "locator": "overview-chart"
+    },
+    {
+      "id": "revenue-structure",
+      "severity": "error",
+      "assert": {
+        "op": "approxEq",
+        "args": [
+          {
+            "ref": "revenueTypes.total"
+          },
+          {
+            "ref": "metrics.revenue.current"
+          },
+          0.11
+        ]
+      },
+      "message": "收入结构不平：分项合计与营业收入不一致",
+      "locator": "revenue-table"
+    },
+    {
+      "id": "cost-structure",
+      "severity": "error",
+      "assert": {
+        "op": "approxEq",
+        "args": [
+          {
+            "ref": "cost.total"
+          },
+          {
+            "ref": "metrics.cost.current"
+          },
+          0.11
+        ]
+      },
+      "message": "成本结构不平：分项合计与总成本不一致",
+      "locator": "cost-detail-table"
+    },
+    {
+      "id": "finance-components",
+      "severity": "error",
+      "assert": {
+        "op": "approxEq",
+        "args": [
+          {
+            "ref": "financeComponents.total"
+          },
+          {
+            "ref": "metrics.finance.current"
+          },
+          0.11
+        ]
+      },
+      "message": "财务费用不平：构成合计与财务费用总额不一致",
+      "locator": "finance-table"
+    }
+  ],
+  "pages": [
+    {
+      "id": "finance-cover",
+      "name": "封面",
+      "section": "财务分析简报",
+      "master": "cover",
+      "orientation": "portrait",
+      "elements": [
+        {
+          "id": "cover-band",
+          "type": "divider",
+          "name": "cover-band",
+          "x": 20,
+          "y": 40,
+          "w": 3,
+          "h": 92,
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "cover-type",
+          "type": "text",
+          "name": "cover-type",
+          "x": 31,
+          "y": 43,
+          "w": 95,
+          "h": 8,
+          "content": "财务分析简报",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "primary",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          }
+        },
+        {
+          "id": "cover-title",
+          "type": "text",
+          "name": "封面标题",
+          "x": 31,
+          "y": 62,
+          "w": 150,
+          "h": 44,
+          "contentTemplate": "{{report.organization}}\n财务分析简报",
+          "semanticRole": "title",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "display",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 750
+          }
+        },
+        {
+          "id": "cover-subtitle",
+          "type": "text",
+          "name": "cover-subtitle",
+          "x": 31,
+          "y": 116,
+          "w": 145,
+          "h": 25,
+          "content": "经营表现、量价趋势、成本结构与财务风险观察",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 12,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.5
+          }
+        },
+        {
+          "id": "cover-period",
+          "type": "text",
+          "name": "cover-period",
+          "x": 31,
+          "y": 235,
+          "w": 110,
+          "h": 8,
+          "contentTemplate": "报告期：{{report.period}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.5,
+            "fontWeight": 650
+          }
+        },
+        {
+          "id": "cover-author",
+          "type": "text",
+          "name": "cover-author",
+          "x": 31,
+          "y": 250,
+          "w": 110,
+          "h": 7,
+          "contentTemplate": "编制：{{report.author}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.5
+          }
+        },
+        {
+          "id": "cover-confidentiality",
+          "type": "text",
+          "name": "cover-confidentiality",
+          "x": 31,
+          "y": 265,
+          "w": 110,
+          "h": 7,
+          "contentTemplate": "{{report.confidentiality}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "accent",
+            "lineHeight": 1.5,
+            "fontWeight": 650
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance-overview",
+      "name": "业绩综述",
+      "section": "核心指标与经营判断",
+      "master": "data",
+      "orientation": "landscape",
+      "elements": [
+        {
+          "id": "overview-title",
+          "type": "text",
+          "name": "页面标题",
+          "x": 18,
+          "y": 19,
+          "w": 200,
+          "h": 14,
+          "content": "核心指标与经营判断",
+          "semanticRole": "title",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "display",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 750
+          }
+        },
+        {
+          "id": "overview-lead",
+          "type": "text",
+          "name": "overview-lead",
+          "x": 18,
+          "y": 38,
+          "w": 246,
+          "h": 13,
+          "contentTemplate": "{{commentary.overview}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.5
+          }
+        },
+        {
+          "id": "revenue-kpi-background",
+          "type": "box",
+          "name": "revenue-kpi-background",
+          "x": 18,
+          "y": 58,
+          "w": 57,
+          "h": 35,
+          "style": {
+            "background": "white",
+            "borderColor": "line",
+            "borderWidth": 0.3,
+            "radius": 1.5
+          },
+          "groupId": "group-revenue-kpi",
+          "groupName": "营业收入",
+          "presetId": "kpi",
+          "presetSlot": "background"
+        },
+        {
+          "id": "revenue-kpi-label",
+          "type": "text",
+          "name": "revenue-kpi-label",
+          "x": 22,
+          "y": 62,
+          "w": 49,
+          "h": 5,
+          "content": "营业收入",
+          "semanticRole": "kpi-label",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-revenue-kpi",
+          "groupName": "营业收入",
+          "presetId": "kpi",
+          "presetSlot": "label"
+        },
+        {
+          "id": "revenue-kpi-value",
+          "type": "text",
+          "name": "revenue-kpi-value",
+          "x": 22,
+          "y": 68,
+          "w": 38.760000000000005,
+          "h": 12,
+          "contentTemplate": "{{metrics.revenue.current|number:1}}",
+          "semanticRole": "kpi-value",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "numeric",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 700
+          },
+          "groupId": "group-revenue-kpi",
+          "groupName": "营业收入",
+          "presetId": "kpi",
+          "presetSlot": "value"
+        },
+        {
+          "id": "revenue-kpi-unit",
+          "type": "text",
+          "name": "revenue-kpi-unit",
+          "x": 57.9,
+          "y": 75,
+          "w": 13.110000000000001,
+          "h": 6,
+          "content": "亿元",
+          "semanticRole": "kpi-unit",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-revenue-kpi",
+          "groupName": "营业收入",
+          "presetId": "kpi",
+          "presetSlot": "unit"
+        },
+        {
+          "id": "revenue-kpi-note",
+          "type": "text",
+          "name": "revenue-kpi-note",
+          "x": 22,
+          "y": 85,
+          "w": 49,
+          "h": 5,
+          "contentTemplate": "同比 {{metrics.revenue.yoy|signedPercent:1}}",
+          "semanticRole": "kpi-note",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "accent",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-revenue-kpi",
+          "groupName": "营业收入",
+          "presetId": "kpi",
+          "presetSlot": "note"
+        },
+        {
+          "id": "profit-kpi-background",
+          "type": "box",
+          "name": "profit-kpi-background",
+          "x": 81,
+          "y": 58,
+          "w": 57,
+          "h": 35,
+          "style": {
+            "background": "white",
+            "borderColor": "line",
+            "borderWidth": 0.3,
+            "radius": 1.5
+          },
+          "groupId": "group-profit-kpi",
+          "groupName": "利润总额",
+          "presetId": "kpi",
+          "presetSlot": "background"
+        },
+        {
+          "id": "profit-kpi-label",
+          "type": "text",
+          "name": "profit-kpi-label",
+          "x": 85,
+          "y": 62,
+          "w": 49,
+          "h": 5,
+          "content": "利润总额",
+          "semanticRole": "kpi-label",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-profit-kpi",
+          "groupName": "利润总额",
+          "presetId": "kpi",
+          "presetSlot": "label"
+        },
+        {
+          "id": "profit-kpi-value",
+          "type": "text",
+          "name": "profit-kpi-value",
+          "x": 85,
+          "y": 68,
+          "w": 38.760000000000005,
+          "h": 12,
+          "contentTemplate": "{{metrics.profit.current|number:1}}",
+          "semanticRole": "kpi-value",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "numeric",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 700
+          },
+          "groupId": "group-profit-kpi",
+          "groupName": "利润总额",
+          "presetId": "kpi",
+          "presetSlot": "value"
+        },
+        {
+          "id": "profit-kpi-unit",
+          "type": "text",
+          "name": "profit-kpi-unit",
+          "x": 120.9,
+          "y": 75,
+          "w": 13.110000000000001,
+          "h": 6,
+          "content": "亿元",
+          "semanticRole": "kpi-unit",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-profit-kpi",
+          "groupName": "利润总额",
+          "presetId": "kpi",
+          "presetSlot": "unit"
+        },
+        {
+          "id": "profit-kpi-note",
+          "type": "text",
+          "name": "profit-kpi-note",
+          "x": 85,
+          "y": 85,
+          "w": 49,
+          "h": 5,
+          "contentTemplate": "同比 {{metrics.profit.yoy|signedPercent:1}}",
+          "semanticRole": "kpi-note",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "accent",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-profit-kpi",
+          "groupName": "利润总额",
+          "presetId": "kpi",
+          "presetSlot": "note"
+        },
+        {
+          "id": "cashflow-kpi-background",
+          "type": "box",
+          "name": "cashflow-kpi-background",
+          "x": 144,
+          "y": 58,
+          "w": 57,
+          "h": 35,
+          "style": {
+            "background": "white",
+            "borderColor": "line",
+            "borderWidth": 0.3,
+            "radius": 1.5
+          },
+          "groupId": "group-cashflow-kpi",
+          "groupName": "经营现金流",
+          "presetId": "kpi",
+          "presetSlot": "background"
+        },
+        {
+          "id": "cashflow-kpi-label",
+          "type": "text",
+          "name": "cashflow-kpi-label",
+          "x": 148,
+          "y": 62,
+          "w": 49,
+          "h": 5,
+          "content": "经营现金流",
+          "semanticRole": "kpi-label",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-cashflow-kpi",
+          "groupName": "经营现金流",
+          "presetId": "kpi",
+          "presetSlot": "label"
+        },
+        {
+          "id": "cashflow-kpi-value",
+          "type": "text",
+          "name": "cashflow-kpi-value",
+          "x": 148,
+          "y": 68,
+          "w": 38.760000000000005,
+          "h": 12,
+          "contentTemplate": "{{metrics.cashflow.current|number:1}}",
+          "semanticRole": "kpi-value",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "numeric",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 700
+          },
+          "groupId": "group-cashflow-kpi",
+          "groupName": "经营现金流",
+          "presetId": "kpi",
+          "presetSlot": "value"
+        },
+        {
+          "id": "cashflow-kpi-unit",
+          "type": "text",
+          "name": "cashflow-kpi-unit",
+          "x": 183.9,
+          "y": 75,
+          "w": 13.110000000000001,
+          "h": 6,
+          "content": "亿元",
+          "semanticRole": "kpi-unit",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-cashflow-kpi",
+          "groupName": "经营现金流",
+          "presetId": "kpi",
+          "presetSlot": "unit"
+        },
+        {
+          "id": "cashflow-kpi-note",
+          "type": "text",
+          "name": "cashflow-kpi-note",
+          "x": 148,
+          "y": 85,
+          "w": 49,
+          "h": 5,
+          "content": "报告月值",
+          "semanticRole": "kpi-note",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "accent",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-cashflow-kpi",
+          "groupName": "经营现金流",
+          "presetId": "kpi",
+          "presetSlot": "note"
+        },
+        {
+          "id": "volume-kpi-background",
+          "type": "box",
+          "name": "volume-kpi-background",
+          "x": 207,
+          "y": 58,
+          "w": 57,
+          "h": 35,
+          "style": {
+            "background": "white",
+            "borderColor": "line",
+            "borderWidth": 0.3,
+            "radius": 1.5
+          },
+          "groupId": "group-volume-kpi",
+          "groupName": "提单箱量",
+          "presetId": "kpi",
+          "presetSlot": "background"
+        },
+        {
+          "id": "volume-kpi-label",
+          "type": "text",
+          "name": "volume-kpi-label",
+          "x": 211,
+          "y": 62,
+          "w": 49,
+          "h": 5,
+          "content": "提单箱量",
+          "semanticRole": "kpi-label",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-volume-kpi",
+          "groupName": "提单箱量",
+          "presetId": "kpi",
+          "presetSlot": "label"
+        },
+        {
+          "id": "volume-kpi-value",
+          "type": "text",
+          "name": "volume-kpi-value",
+          "x": 211,
+          "y": 68,
+          "w": 38.760000000000005,
+          "h": 12,
+          "contentTemplate": "{{metrics.volume.current|number:1}}",
+          "semanticRole": "kpi-value",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "numeric",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 700
+          },
+          "groupId": "group-volume-kpi",
+          "groupName": "提单箱量",
+          "presetId": "kpi",
+          "presetSlot": "value"
+        },
+        {
+          "id": "volume-kpi-unit",
+          "type": "text",
+          "name": "volume-kpi-unit",
+          "x": 246.9,
+          "y": 75,
+          "w": 13.110000000000001,
+          "h": 6,
+          "content": "万TEU",
+          "semanticRole": "kpi-unit",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-volume-kpi",
+          "groupName": "提单箱量",
+          "presetId": "kpi",
+          "presetSlot": "unit"
+        },
+        {
+          "id": "volume-kpi-note",
+          "type": "text",
+          "name": "volume-kpi-note",
+          "x": 211,
+          "y": 85,
+          "w": 49,
+          "h": 5,
+          "contentTemplate": "同比 {{metrics.volume.yoy|signedPercent:1}}",
+          "semanticRole": "kpi-note",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "accent",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-volume-kpi",
+          "groupName": "提单箱量",
+          "presetId": "kpi",
+          "presetSlot": "note"
+        },
+        {
+          "id": "overview-chart-caption",
+          "type": "text",
+          "name": "overview-chart-caption",
+          "x": 18,
+          "y": 105,
+          "w": 155,
+          "h": 7,
+          "content": "收入、成本与利润趋势",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-overview-chart",
+          "groupName": "收入、成本与利润趋势",
+          "presetId": "chart-combo",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "overview-chart",
+          "type": "chart",
+          "name": "收入、成本与利润趋势",
+          "x": 18,
+          "y": 112,
+          "w": 155,
+          "h": 63,
+          "chartKind": "combo",
+          "chartBinding": {
+            "categories": {
+              "ref": "months"
+            },
+            "series": [
+              {
+                "name": "营业收入",
+                "values": {
+                  "ref": "metrics.revenue.monthly"
+                },
+                "kind": "bar",
+                "axis": "left",
+                "unit": "亿元"
+              },
+              {
+                "name": "总成本",
+                "values": {
+                  "ref": "metrics.cost.monthly"
+                },
+                "kind": "bar",
+                "axis": "left",
+                "unit": "亿元"
+              },
+              {
+                "name": "利润总额",
+                "values": {
+                  "ref": "metrics.profit.monthly"
+                },
+                "kind": "line",
+                "axis": "right",
+                "unit": "亿元"
+              }
+            ]
+          },
+          "style": {
+            "background": "white",
+            "showLabel": true,
+            "showLegend": true,
+            "padding": 2
+          },
+          "groupId": "group-overview-chart",
+          "groupName": "收入、成本与利润趋势",
+          "presetId": "chart-combo",
+          "presetSlot": "chart"
+        },
+        {
+          "id": "overview-quote-background",
+          "type": "box",
+          "name": "overview-quote-background",
+          "x": 183,
+          "y": 105,
+          "w": 81,
+          "h": 70,
+          "style": {
+            "background": "secondary",
+            "borderColor": "transparent",
+            "borderWidth": 0.3,
+            "radius": 1.5
+          },
+          "groupId": "group-overview-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "background"
+        },
+        {
+          "id": "overview-quote-mark",
+          "type": "text",
+          "name": "overview-quote-mark",
+          "x": 188,
+          "y": 107,
+          "w": 10,
+          "h": 12,
+          "content": "“",
+          "semanticRole": "quote-mark",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "body",
+            "color": "primary",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-overview-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "mark"
+        },
+        {
+          "id": "overview-quote-body",
+          "type": "text",
+          "name": "overview-quote-body",
+          "x": 197,
+          "y": 112,
+          "w": 61,
+          "h": 53,
+          "contentTemplate": "{{commentary.overview}}",
+          "semanticRole": "quote-body",
+          "style": {
+            "fontSize": 12,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.5,
+            "fontWeight": 650
+          },
+          "groupId": "group-overview-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "body"
+        },
+        {
+          "id": "overview-quote-attribution",
+          "type": "text",
+          "name": "overview-quote-attribution",
+          "x": 197,
+          "y": 167,
+          "w": 61,
+          "h": 5,
+          "content": "本期管理判断",
+          "semanticRole": "quote-attribution",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-overview-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "attribution"
+        },
+        {
+          "id": "overview-source",
+          "type": "text",
+          "name": "资料来源",
+          "x": 18,
+          "y": 180,
+          "w": 246,
+          "h": 7,
+          "contentTemplate": "资料来源：{{report.source}}",
+          "semanticRole": "source",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance-drivers",
+      "name": "经营影响因素",
+      "section": "业绩综述",
+      "master": "data",
+      "orientation": "landscape",
+      "elements": [
+        {
+          "id": "drivers-title",
+          "type": "text",
+          "name": "页面标题",
+          "x": 18,
+          "y": 19,
+          "w": 210,
+          "h": 14,
+          "content": "经营影响因素与量价观察",
+          "semanticRole": "title",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "display",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 750
+          }
+        },
+        {
+          "id": "drivers-commentary",
+          "type": "text",
+          "name": "drivers-commentary",
+          "x": 18,
+          "y": 38,
+          "w": 246,
+          "h": 14,
+          "contentTemplate": "{{commentary.drivers}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.5
+          }
+        },
+        {
+          "id": "drivers-volume-caption",
+          "type": "text",
+          "name": "drivers-volume-caption",
+          "x": 18,
+          "y": 61,
+          "w": 118,
+          "h": 7,
+          "content": "提单箱量趋势",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-drivers-volume",
+          "groupName": "提单箱量趋势",
+          "presetId": "chart-line",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "drivers-volume",
+          "type": "chart",
+          "name": "提单箱量趋势",
+          "x": 18,
+          "y": 68,
+          "w": 118,
+          "h": 93,
+          "chartKind": "line",
+          "chartBinding": {
+            "categories": {
+              "ref": "months"
+            },
+            "series": [
+              {
+                "name": "提单箱量",
+                "values": {
+                  "ref": "metrics.volume.monthly"
+                },
+                "kind": "line",
+                "axis": "left",
+                "unit": "万TEU"
+              }
+            ]
+          },
+          "style": {
+            "background": "white",
+            "showLabel": true,
+            "showLegend": true,
+            "padding": 2
+          },
+          "groupId": "group-drivers-volume",
+          "groupName": "提单箱量趋势",
+          "presetId": "chart-line",
+          "presetSlot": "chart"
+        },
+        {
+          "id": "drivers-unit-revenue-caption",
+          "type": "text",
+          "name": "drivers-unit-revenue-caption",
+          "x": 146,
+          "y": 61,
+          "w": 118,
+          "h": 7,
+          "content": "单箱收入趋势",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-drivers-unit-revenue",
+          "groupName": "单箱收入趋势",
+          "presetId": "chart-line",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "drivers-unit-revenue",
+          "type": "chart",
+          "name": "单箱收入趋势",
+          "x": 146,
+          "y": 68,
+          "w": 118,
+          "h": 93,
+          "chartKind": "line",
+          "chartBinding": {
+            "categories": {
+              "ref": "months"
+            },
+            "series": [
+              {
+                "name": "单箱收入",
+                "values": {
+                  "ref": "metrics.unitRevenue.monthly"
+                },
+                "kind": "line",
+                "axis": "left",
+                "unit": "元/TEU"
+              }
+            ]
+          },
+          "style": {
+            "background": "white",
+            "showLabel": true,
+            "showLegend": true,
+            "padding": 2
+          },
+          "groupId": "group-drivers-unit-revenue",
+          "groupName": "单箱收入趋势",
+          "presetId": "chart-line",
+          "presetSlot": "chart"
+        },
+        {
+          "id": "drivers-source",
+          "type": "text",
+          "name": "资料来源",
+          "x": 18,
+          "y": 170,
+          "w": 246,
+          "h": 7,
+          "contentTemplate": "资料来源：{{report.source}}",
+          "semanticRole": "source",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance-revenue",
+      "name": "收入结构",
+      "section": "收入与结构分析",
+      "master": "data",
+      "orientation": "portrait",
+      "elements": [
+        {
+          "id": "revenue-title",
+          "type": "text",
+          "name": "页面标题",
+          "x": 18,
+          "y": 19,
+          "w": 174,
+          "h": 14,
+          "content": "航运业务收入与收入类型",
+          "semanticRole": "title",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "display",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 750
+          }
+        },
+        {
+          "id": "revenue-commentary",
+          "type": "text",
+          "name": "revenue-commentary",
+          "x": 18,
+          "y": 39,
+          "w": 174,
+          "h": 18,
+          "contentTemplate": "{{commentary.revenue}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.5
+          }
+        },
+        {
+          "id": "revenue-structure-caption",
+          "type": "text",
+          "name": "revenue-structure-caption",
+          "x": 18,
+          "y": 66,
+          "w": 174,
+          "h": 7,
+          "content": "报告月收入结构",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-revenue-structure",
+          "groupName": "报告月收入结构",
+          "presetId": "chart-donut",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "revenue-structure",
+          "type": "chart",
+          "name": "报告月收入结构",
+          "x": 18,
+          "y": 73,
+          "w": 174,
+          "h": 73,
+          "chartKind": "donut",
+          "chartBinding": {
+            "categories": {
+              "ref": "revenueTypes.labels"
+            },
+            "series": [
+              {
+                "name": "收入结构",
+                "values": {
+                  "ref": "revenueTypes.current"
+                }
+              }
+            ]
+          },
+          "style": {
+            "background": "white",
+            "showLabel": true,
+            "showLegend": true,
+            "padding": 2
+          },
+          "groupId": "group-revenue-structure",
+          "groupName": "报告月收入结构",
+          "presetId": "chart-donut",
+          "presetSlot": "chart"
+        },
+        {
+          "id": "revenue-table-caption",
+          "type": "text",
+          "name": "revenue-table-caption",
+          "x": 18,
+          "y": 153,
+          "w": 174,
+          "h": 7,
+          "content": "收入结构明细",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-revenue-table",
+          "groupName": "收入结构明细",
+          "presetId": "table-block",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "revenue-table",
+          "type": "table",
+          "name": "收入结构明细",
+          "x": 18,
+          "y": 160,
+          "w": 174,
+          "h": 62,
+          "tableBinding": {
+            "headers": {
+              "value": [
+                "收入类型",
+                "报告月",
+                "占比"
+              ]
+            },
+            "columns": [
+              {
+                "values": {
+                  "ref": "revenueTypes.labels"
+                }
+              },
+              {
+                "values": {
+                  "ref": "revenueTypes.current"
+                },
+                "format": "number",
+                "digits": 1
+              },
+              {
+                "values": {
+                  "ref": "revenueTypes.shares"
+                },
+                "format": "percent",
+                "digits": 1
+              }
+            ]
+          },
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "text",
+            "background": "white",
+            "borderColor": "line",
+            "padding": 1
+          },
+          "groupId": "group-revenue-table",
+          "groupName": "收入结构明细",
+          "presetId": "table-block",
+          "presetSlot": "table"
+        },
+        {
+          "id": "revenue-quote-background",
+          "type": "box",
+          "name": "revenue-quote-background",
+          "x": 18,
+          "y": 230,
+          "w": 174,
+          "h": 43,
+          "style": {
+            "background": "secondary",
+            "borderColor": "transparent",
+            "borderWidth": 0.3,
+            "radius": 1.5
+          },
+          "groupId": "group-revenue-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "background"
+        },
+        {
+          "id": "revenue-quote-mark",
+          "type": "text",
+          "name": "revenue-quote-mark",
+          "x": 23,
+          "y": 232,
+          "w": 10,
+          "h": 12,
+          "content": "“",
+          "semanticRole": "quote-mark",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "body",
+            "color": "primary",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-revenue-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "mark"
+        },
+        {
+          "id": "revenue-quote-body",
+          "type": "text",
+          "name": "revenue-quote-body",
+          "x": 32,
+          "y": 237,
+          "w": 154,
+          "h": 26,
+          "contentTemplate": "{{commentary.revenue}}",
+          "semanticRole": "quote-body",
+          "style": {
+            "fontSize": 12,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.5,
+            "fontWeight": 650
+          },
+          "groupId": "group-revenue-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "body"
+        },
+        {
+          "id": "revenue-quote-attribution",
+          "type": "text",
+          "name": "revenue-quote-attribution",
+          "x": 32,
+          "y": 265,
+          "w": 154,
+          "h": 5,
+          "content": "结构分析",
+          "semanticRole": "quote-attribution",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-revenue-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "attribution"
+        },
+        {
+          "id": "revenue-source",
+          "type": "text",
+          "name": "资料来源",
+          "x": 18,
+          "y": 278,
+          "w": 174,
+          "h": 7,
+          "contentTemplate": "资料来源：{{report.source}}",
+          "semanticRole": "source",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance-trade",
+      "name": "贸易区",
+      "section": "收入与结构分析",
+      "master": "data",
+      "orientation": "landscape",
+      "elements": [
+        {
+          "id": "trade-title",
+          "type": "text",
+          "name": "页面标题",
+          "x": 18,
+          "y": 19,
+          "w": 210,
+          "h": 14,
+          "content": "主要贸易区航运业务收入",
+          "semanticRole": "title",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "display",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 750
+          }
+        },
+        {
+          "id": "trade-commentary",
+          "type": "text",
+          "name": "trade-commentary",
+          "x": 18,
+          "y": 38,
+          "w": 246,
+          "h": 14,
+          "contentTemplate": "{{commentary.trade}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.5
+          }
+        },
+        {
+          "id": "trade-chart-caption",
+          "type": "text",
+          "name": "trade-chart-caption",
+          "x": 18,
+          "y": 61,
+          "w": 112,
+          "h": 7,
+          "content": "贸易区收入对比",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-trade-chart",
+          "groupName": "贸易区收入对比",
+          "presetId": "chart-bar",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "trade-chart",
+          "type": "chart",
+          "name": "贸易区收入对比",
+          "x": 18,
+          "y": 68,
+          "w": 112,
+          "h": 94,
+          "chartKind": "bar",
+          "chartBinding": {
+            "categories": {
+              "ref": "trade.labels"
+            },
+            "series": [
+              {
+                "name": "营业收入",
+                "values": {
+                  "ref": "trade.revenueCurrent"
+                },
+                "kind": "bar",
+                "axis": "left",
+                "unit": "亿元"
+              }
+            ]
+          },
+          "style": {
+            "background": "white",
+            "showLabel": true,
+            "showLegend": true,
+            "padding": 2
+          },
+          "groupId": "group-trade-chart",
+          "groupName": "贸易区收入对比",
+          "presetId": "chart-bar",
+          "presetSlot": "chart"
+        },
+        {
+          "id": "trade-table-caption",
+          "type": "text",
+          "name": "trade-table-caption",
+          "x": 142,
+          "y": 61,
+          "w": 122,
+          "h": 7,
+          "content": "贸易区量价明细",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-trade-table",
+          "groupName": "贸易区量价明细",
+          "presetId": "table-block",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "trade-table",
+          "type": "table",
+          "name": "贸易区量价明细",
+          "x": 142,
+          "y": 68,
+          "w": 122,
+          "h": 94,
+          "tableBinding": {
+            "headers": {
+              "value": [
+                "贸易区",
+                "收入(亿元)",
+                "箱量(万TEU)",
+                "单箱收入"
+              ]
+            },
+            "columns": [
+              {
+                "values": {
+                  "ref": "trade.labels"
+                }
+              },
+              {
+                "values": {
+                  "ref": "trade.revenueCurrent"
+                },
+                "format": "number",
+                "digits": 1
+              },
+              {
+                "values": {
+                  "ref": "trade.volumeCurrent"
+                },
+                "format": "number",
+                "digits": 1
+              },
+              {
+                "values": {
+                  "ref": "trade.unitRevenue"
+                },
+                "format": "integer"
+              }
+            ]
+          },
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "text",
+            "background": "white",
+            "borderColor": "line",
+            "padding": 1
+          },
+          "groupId": "group-trade-table",
+          "groupName": "贸易区量价明细",
+          "presetId": "table-block",
+          "presetSlot": "table"
+        },
+        {
+          "id": "trade-source",
+          "type": "text",
+          "name": "资料来源",
+          "x": 18,
+          "y": 171,
+          "w": 246,
+          "h": 7,
+          "contentTemplate": "资料来源：{{report.source}}",
+          "semanticRole": "source",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance-freight",
+      "name": "单箱收入",
+      "section": "收入与结构分析",
+      "master": "data",
+      "orientation": "landscape",
+      "elements": [
+        {
+          "id": "freight-title",
+          "type": "text",
+          "name": "页面标题",
+          "x": 18,
+          "y": 19,
+          "w": 220,
+          "h": 14,
+          "content": "各贸易区单箱运费收入趋势",
+          "semanticRole": "title",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "display",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 750
+          }
+        },
+        {
+          "id": "freight-commentary",
+          "type": "text",
+          "name": "freight-commentary",
+          "x": 18,
+          "y": 38,
+          "w": 246,
+          "h": 16,
+          "contentTemplate": "{{commentary.freight}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.5
+          }
+        },
+        {
+          "id": "freight-chart-caption",
+          "type": "text",
+          "name": "freight-chart-caption",
+          "x": 18,
+          "y": 64,
+          "w": 246,
+          "h": 7,
+          "content": "重点贸易区单箱收入",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-freight-chart",
+          "groupName": "重点贸易区单箱收入",
+          "presetId": "chart-line",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "freight-chart",
+          "type": "chart",
+          "name": "重点贸易区单箱收入",
+          "x": 18,
+          "y": 71,
+          "w": 246,
+          "h": 95,
+          "chartKind": "line",
+          "chartBinding": {
+            "categories": {
+              "ref": "months"
+            },
+            "series": [
+              {
+                "name": "美洲",
+                "values": {
+                  "ref": "freight.america"
+                },
+                "kind": "line",
+                "axis": "left",
+                "unit": "USD/TEU"
+              },
+              {
+                "name": "欧洲",
+                "values": {
+                  "ref": "freight.europe"
+                },
+                "kind": "line",
+                "axis": "left",
+                "unit": "USD/TEU"
+              },
+              {
+                "name": "亚太",
+                "values": {
+                  "ref": "freight.asia"
+                },
+                "kind": "line",
+                "axis": "left",
+                "unit": "USD/TEU"
+              }
+            ]
+          },
+          "style": {
+            "background": "white",
+            "showLabel": true,
+            "showLegend": true,
+            "padding": 2
+          },
+          "groupId": "group-freight-chart",
+          "groupName": "重点贸易区单箱收入",
+          "presetId": "chart-line",
+          "presetSlot": "chart"
+        },
+        {
+          "id": "freight-source",
+          "type": "text",
+          "name": "资料来源",
+          "x": 18,
+          "y": 175,
+          "w": 246,
+          "h": 7,
+          "contentTemplate": "资料来源：{{report.source}}",
+          "semanticRole": "source",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance-cost-overview",
+      "name": "成本概况",
+      "section": "成本与盈利分析",
+      "master": "data",
+      "orientation": "landscape",
+      "elements": [
+        {
+          "id": "cost-overview-title",
+          "type": "text",
+          "name": "页面标题",
+          "x": 18,
+          "y": 19,
+          "w": 210,
+          "h": 14,
+          "content": "成本概况与结构动因",
+          "semanticRole": "title",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "display",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 750
+          }
+        },
+        {
+          "id": "cost-overview-commentary",
+          "type": "text",
+          "name": "cost-overview-commentary",
+          "x": 18,
+          "y": 38,
+          "w": 246,
+          "h": 15,
+          "contentTemplate": "{{commentary.cost}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.5
+          }
+        },
+        {
+          "id": "cost-kpi-background",
+          "type": "box",
+          "name": "cost-kpi-background",
+          "x": 18,
+          "y": 65,
+          "w": 65,
+          "h": 35,
+          "style": {
+            "background": "white",
+            "borderColor": "line",
+            "borderWidth": 0.3,
+            "radius": 1.5
+          },
+          "groupId": "group-cost-kpi",
+          "groupName": "报告月总成本",
+          "presetId": "kpi",
+          "presetSlot": "background"
+        },
+        {
+          "id": "cost-kpi-label",
+          "type": "text",
+          "name": "cost-kpi-label",
+          "x": 22,
+          "y": 69,
+          "w": 57,
+          "h": 5,
+          "content": "报告月总成本",
+          "semanticRole": "kpi-label",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-cost-kpi",
+          "groupName": "报告月总成本",
+          "presetId": "kpi",
+          "presetSlot": "label"
+        },
+        {
+          "id": "cost-kpi-value",
+          "type": "text",
+          "name": "cost-kpi-value",
+          "x": 22,
+          "y": 75,
+          "w": 44.2,
+          "h": 12,
+          "contentTemplate": "{{metrics.cost.current|number:1}}",
+          "semanticRole": "kpi-value",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "numeric",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 700
+          },
+          "groupId": "group-cost-kpi",
+          "groupName": "报告月总成本",
+          "presetId": "kpi",
+          "presetSlot": "value"
+        },
+        {
+          "id": "cost-kpi-unit",
+          "type": "text",
+          "name": "cost-kpi-unit",
+          "x": 63.5,
+          "y": 82,
+          "w": 14.950000000000001,
+          "h": 6,
+          "content": "亿元",
+          "semanticRole": "kpi-unit",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-cost-kpi",
+          "groupName": "报告月总成本",
+          "presetId": "kpi",
+          "presetSlot": "unit"
+        },
+        {
+          "id": "cost-kpi-note",
+          "type": "text",
+          "name": "cost-kpi-note",
+          "x": 22,
+          "y": 92,
+          "w": 57,
+          "h": 5,
+          "contentTemplate": "同比 {{metrics.cost.yoy|signedPercent:1}}",
+          "semanticRole": "kpi-note",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "accent",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-cost-kpi",
+          "groupName": "报告月总成本",
+          "presetId": "kpi",
+          "presetSlot": "note"
+        },
+        {
+          "id": "cost-structure-caption",
+          "type": "text",
+          "name": "cost-structure-caption",
+          "x": 94,
+          "y": 65,
+          "w": 170,
+          "h": 7,
+          "content": "成本结构",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-cost-structure",
+          "groupName": "成本结构",
+          "presetId": "chart-bar",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "cost-structure",
+          "type": "chart",
+          "name": "成本结构",
+          "x": 94,
+          "y": 72,
+          "w": 170,
+          "h": 95,
+          "chartKind": "bar",
+          "chartBinding": {
+            "categories": {
+              "ref": "cost.labels"
+            },
+            "series": [
+              {
+                "name": "报告月成本",
+                "values": {
+                  "ref": "cost.current"
+                },
+                "kind": "bar",
+                "axis": "left",
+                "unit": "亿元"
+              }
+            ]
+          },
+          "style": {
+            "background": "white",
+            "showLabel": true,
+            "showLegend": true,
+            "padding": 2
+          },
+          "groupId": "group-cost-structure",
+          "groupName": "成本结构",
+          "presetId": "chart-bar",
+          "presetSlot": "chart"
+        },
+        {
+          "id": "cost-quote-background",
+          "type": "box",
+          "name": "cost-quote-background",
+          "x": 18,
+          "y": 111,
+          "w": 65,
+          "h": 56,
+          "style": {
+            "background": "secondary",
+            "borderColor": "transparent",
+            "borderWidth": 0.3,
+            "radius": 1.5
+          },
+          "groupId": "group-cost-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "background"
+        },
+        {
+          "id": "cost-quote-mark",
+          "type": "text",
+          "name": "cost-quote-mark",
+          "x": 23,
+          "y": 113,
+          "w": 10,
+          "h": 12,
+          "content": "“",
+          "semanticRole": "quote-mark",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "body",
+            "color": "primary",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-cost-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "mark"
+        },
+        {
+          "id": "cost-quote-body",
+          "type": "text",
+          "name": "cost-quote-body",
+          "x": 32,
+          "y": 118,
+          "w": 45,
+          "h": 39,
+          "contentTemplate": "{{commentary.cost}}",
+          "semanticRole": "quote-body",
+          "style": {
+            "fontSize": 12,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.5,
+            "fontWeight": 650
+          },
+          "groupId": "group-cost-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "body"
+        },
+        {
+          "id": "cost-quote-attribution",
+          "type": "text",
+          "name": "cost-quote-attribution",
+          "x": 32,
+          "y": 159,
+          "w": 45,
+          "h": 5,
+          "content": "成本观察",
+          "semanticRole": "quote-attribution",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-cost-quote",
+          "groupName": "管理判断",
+          "presetId": "quote",
+          "presetSlot": "attribution"
+        },
+        {
+          "id": "cost-overview-source",
+          "type": "text",
+          "name": "资料来源",
+          "x": 18,
+          "y": 176,
+          "w": 246,
+          "h": 7,
+          "contentTemplate": "资料来源：{{report.source}}",
+          "semanticRole": "source",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance-cost-detail",
+      "name": "成本构成",
+      "section": "成本与盈利分析",
+      "master": "data",
+      "orientation": "portrait",
+      "elements": [
+        {
+          "id": "cost-detail-title",
+          "type": "text",
+          "name": "页面标题",
+          "x": 18,
+          "y": 19,
+          "w": 174,
+          "h": 14,
+          "content": "航运成本构成",
+          "semanticRole": "title",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "display",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 750
+          }
+        },
+        {
+          "id": "cost-detail-commentary",
+          "type": "text",
+          "name": "cost-detail-commentary",
+          "x": 18,
+          "y": 39,
+          "w": 174,
+          "h": 15,
+          "contentTemplate": "{{commentary.cost}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.5
+          }
+        },
+        {
+          "id": "cost-detail-table-caption",
+          "type": "text",
+          "name": "cost-detail-table-caption",
+          "x": 18,
+          "y": 64,
+          "w": 174,
+          "h": 7,
+          "content": "九项成本明细",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-cost-detail-table",
+          "groupName": "九项成本明细",
+          "presetId": "table-block",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "cost-detail-table",
+          "type": "table",
+          "name": "九项成本明细",
+          "x": 18,
+          "y": 71,
+          "w": 174,
+          "h": 144,
+          "tableBinding": {
+            "headers": {
+              "value": [
+                "成本项目",
+                "报告月(亿元)",
+                "结构占比"
+              ]
+            },
+            "columns": [
+              {
+                "values": {
+                  "ref": "cost.labels"
+                }
+              },
+              {
+                "values": {
+                  "ref": "cost.current"
+                },
+                "format": "number",
+                "digits": 1
+              },
+              {
+                "values": {
+                  "ref": "cost.shares"
+                },
+                "format": "percent",
+                "digits": 1
+              }
+            ]
+          },
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "text",
+            "background": "white",
+            "borderColor": "line",
+            "padding": 1
+          },
+          "groupId": "group-cost-detail-table",
+          "groupName": "九项成本明细",
+          "presetId": "table-block",
+          "presetSlot": "table"
+        },
+        {
+          "id": "cost-detail-source",
+          "type": "text",
+          "name": "资料来源",
+          "x": 18,
+          "y": 225,
+          "w": 174,
+          "h": 7,
+          "contentTemplate": "资料来源：{{report.source}}",
+          "semanticRole": "source",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance-admin",
+      "name": "管理与财务费用",
+      "section": "管理与财务费用",
+      "master": "data",
+      "orientation": "landscape",
+      "elements": [
+        {
+          "id": "admin-title",
+          "type": "text",
+          "name": "页面标题",
+          "x": 18,
+          "y": 19,
+          "w": 230,
+          "h": 14,
+          "content": "费用效率、资金与债务安全",
+          "semanticRole": "title",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "display",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 750
+          }
+        },
+        {
+          "id": "admin-commentary",
+          "type": "text",
+          "name": "admin-commentary",
+          "x": 18,
+          "y": 38,
+          "w": 246,
+          "h": 15,
+          "contentTemplate": "{{commentary.finance}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.5
+          }
+        },
+        {
+          "id": "management-kpi-background",
+          "type": "box",
+          "name": "management-kpi-background",
+          "x": 18,
+          "y": 64,
+          "w": 65,
+          "h": 35,
+          "style": {
+            "background": "white",
+            "borderColor": "line",
+            "borderWidth": 0.3,
+            "radius": 1.5
+          },
+          "groupId": "group-management-kpi",
+          "groupName": "管理费用",
+          "presetId": "kpi",
+          "presetSlot": "background"
+        },
+        {
+          "id": "management-kpi-label",
+          "type": "text",
+          "name": "management-kpi-label",
+          "x": 22,
+          "y": 68,
+          "w": 57,
+          "h": 5,
+          "content": "管理费用",
+          "semanticRole": "kpi-label",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-management-kpi",
+          "groupName": "管理费用",
+          "presetId": "kpi",
+          "presetSlot": "label"
+        },
+        {
+          "id": "management-kpi-value",
+          "type": "text",
+          "name": "management-kpi-value",
+          "x": 22,
+          "y": 74,
+          "w": 44.2,
+          "h": 12,
+          "contentTemplate": "{{metrics.management.current|number:1}}",
+          "semanticRole": "kpi-value",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "numeric",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 700
+          },
+          "groupId": "group-management-kpi",
+          "groupName": "管理费用",
+          "presetId": "kpi",
+          "presetSlot": "value"
+        },
+        {
+          "id": "management-kpi-unit",
+          "type": "text",
+          "name": "management-kpi-unit",
+          "x": 63.5,
+          "y": 81,
+          "w": 14.950000000000001,
+          "h": 6,
+          "content": "亿元",
+          "semanticRole": "kpi-unit",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-management-kpi",
+          "groupName": "管理费用",
+          "presetId": "kpi",
+          "presetSlot": "unit"
+        },
+        {
+          "id": "management-kpi-note",
+          "type": "text",
+          "name": "management-kpi-note",
+          "x": 22,
+          "y": 91,
+          "w": 57,
+          "h": 5,
+          "content": "报告月值",
+          "semanticRole": "kpi-note",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "accent",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-management-kpi",
+          "groupName": "管理费用",
+          "presetId": "kpi",
+          "presetSlot": "note"
+        },
+        {
+          "id": "finance-kpi-background",
+          "type": "box",
+          "name": "finance-kpi-background",
+          "x": 90,
+          "y": 64,
+          "w": 65,
+          "h": 35,
+          "style": {
+            "background": "white",
+            "borderColor": "line",
+            "borderWidth": 0.3,
+            "radius": 1.5
+          },
+          "groupId": "group-finance-kpi",
+          "groupName": "财务费用",
+          "presetId": "kpi",
+          "presetSlot": "background"
+        },
+        {
+          "id": "finance-kpi-label",
+          "type": "text",
+          "name": "finance-kpi-label",
+          "x": 94,
+          "y": 68,
+          "w": 57,
+          "h": 5,
+          "content": "财务费用",
+          "semanticRole": "kpi-label",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-finance-kpi",
+          "groupName": "财务费用",
+          "presetId": "kpi",
+          "presetSlot": "label"
+        },
+        {
+          "id": "finance-kpi-value",
+          "type": "text",
+          "name": "finance-kpi-value",
+          "x": 94,
+          "y": 74,
+          "w": 44.2,
+          "h": 12,
+          "contentTemplate": "{{metrics.finance.current|number:1}}",
+          "semanticRole": "kpi-value",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "numeric",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 700
+          },
+          "groupId": "group-finance-kpi",
+          "groupName": "财务费用",
+          "presetId": "kpi",
+          "presetSlot": "value"
+        },
+        {
+          "id": "finance-kpi-unit",
+          "type": "text",
+          "name": "finance-kpi-unit",
+          "x": 135.5,
+          "y": 81,
+          "w": 14.950000000000001,
+          "h": 6,
+          "content": "亿元",
+          "semanticRole": "kpi-unit",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          },
+          "groupId": "group-finance-kpi",
+          "groupName": "财务费用",
+          "presetId": "kpi",
+          "presetSlot": "unit"
+        },
+        {
+          "id": "finance-kpi-note",
+          "type": "text",
+          "name": "finance-kpi-note",
+          "x": 94,
+          "y": 91,
+          "w": 57,
+          "h": 5,
+          "content": "报告月值",
+          "semanticRole": "kpi-note",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "accent",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-finance-kpi",
+          "groupName": "财务费用",
+          "presetId": "kpi",
+          "presetSlot": "note"
+        },
+        {
+          "id": "admin-chart-caption",
+          "type": "text",
+          "name": "admin-chart-caption",
+          "x": 164,
+          "y": 64,
+          "w": 100,
+          "h": 7,
+          "content": "管理与财务费用趋势",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-admin-chart",
+          "groupName": "管理与财务费用趋势",
+          "presetId": "chart-combo",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "admin-chart",
+          "type": "chart",
+          "name": "管理与财务费用趋势",
+          "x": 164,
+          "y": 71,
+          "w": 100,
+          "h": 95,
+          "chartKind": "combo",
+          "chartBinding": {
+            "categories": {
+              "ref": "months"
+            },
+            "series": [
+              {
+                "name": "管理费用",
+                "values": {
+                  "ref": "metrics.management.monthly"
+                },
+                "kind": "bar",
+                "axis": "left",
+                "unit": "亿元"
+              },
+              {
+                "name": "财务费用",
+                "values": {
+                  "ref": "metrics.finance.monthly"
+                },
+                "kind": "line",
+                "axis": "right",
+                "unit": "亿元"
+              }
+            ]
+          },
+          "style": {
+            "background": "white",
+            "showLabel": true,
+            "showLegend": true,
+            "padding": 2
+          },
+          "groupId": "group-admin-chart",
+          "groupName": "管理与财务费用趋势",
+          "presetId": "chart-combo",
+          "presetSlot": "chart"
+        },
+        {
+          "id": "finance-table-caption",
+          "type": "text",
+          "name": "finance-table-caption",
+          "x": 18,
+          "y": 112,
+          "w": 137,
+          "h": 7,
+          "content": "资金与财务费用明细",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-finance-table",
+          "groupName": "资金与财务费用明细",
+          "presetId": "table-block",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "finance-table",
+          "type": "table",
+          "name": "资金与财务费用明细",
+          "x": 18,
+          "y": 119,
+          "w": 137,
+          "h": 52,
+          "tableBinding": {
+            "headers": {
+              "value": [
+                "指标",
+                "报告月",
+                "口径"
+              ]
+            },
+            "columns": [
+              {
+                "values": {
+                  "ref": "finance.labels"
+                }
+              },
+              {
+                "values": {
+                  "ref": "finance.values"
+                },
+                "format": "accounting",
+                "digits": 1,
+                "suffix": "亿元"
+              },
+              {
+                "values": {
+                  "ref": "finance.scope"
+                }
+              }
+            ]
+          },
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "text",
+            "background": "white",
+            "borderColor": "line",
+            "padding": 1
+          },
+          "groupId": "group-finance-table",
+          "groupName": "资金与财务费用明细",
+          "presetId": "table-block",
+          "presetSlot": "table"
+        },
+        {
+          "id": "admin-source",
+          "type": "text",
+          "name": "资料来源",
+          "x": 18,
+          "y": 175,
+          "w": 246,
+          "h": 7,
+          "contentTemplate": "资料来源：{{report.source}}",
+          "semanticRole": "source",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          }
+        }
+      ]
+    },
+    {
+      "id": "finance-history",
+      "name": "近四年指标",
+      "section": "长期观察",
+      "master": "data",
+      "orientation": "landscape",
+      "elements": [
+        {
+          "id": "history-title",
+          "type": "text",
+          "name": "页面标题",
+          "x": 18,
+          "y": 19,
+          "w": 220,
+          "h": 14,
+          "content": "近四年主要运行指标",
+          "semanticRole": "title",
+          "style": {
+            "fontSize": 28,
+            "fontSlot": "display",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 750
+          }
+        },
+        {
+          "id": "history-commentary",
+          "type": "text",
+          "name": "history-commentary",
+          "x": 18,
+          "y": 38,
+          "w": 246,
+          "h": 15,
+          "contentTemplate": "{{commentary.history}}",
+          "semanticRole": "body",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.5
+          }
+        },
+        {
+          "id": "history-table-caption",
+          "type": "text",
+          "name": "history-table-caption",
+          "x": 18,
+          "y": 64,
+          "w": 246,
+          "h": 7,
+          "content": "主要运行指标",
+          "semanticRole": "caption",
+          "style": {
+            "fontSize": 10,
+            "fontSlot": "body",
+            "color": "text",
+            "lineHeight": 1.2,
+            "fontWeight": 650
+          },
+          "groupId": "group-history-table",
+          "groupName": "主要运行指标",
+          "presetId": "table-block",
+          "presetSlot": "caption"
+        },
+        {
+          "id": "history-table",
+          "type": "table",
+          "name": "主要运行指标",
+          "x": 18,
+          "y": 71,
+          "w": 246,
+          "h": 97,
+          "tableBinding": {
+            "headers": {
+              "ref": "history.headers"
+            },
+            "rows": {
+              "ref": "history.rows"
+            }
+          },
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "text",
+            "background": "white",
+            "borderColor": "line",
+            "padding": 1
+          },
+          "groupId": "group-history-table",
+          "groupName": "主要运行指标",
+          "presetId": "table-block",
+          "presetSlot": "table"
+        },
+        {
+          "id": "history-source",
+          "type": "text",
+          "name": "资料来源",
+          "x": 18,
+          "y": 177,
+          "w": 246,
+          "h": 7,
+          "contentTemplate": "资料来源：{{report.source}}",
+          "semanticRole": "source",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "lineHeight": 1.2
+          }
+        }
+      ]
+    }
+  ]
+}

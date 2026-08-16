@@ -1,0 +1,60 @@
+{
+  "product": "Local Report Studio",
+  "applicationVersion": "1.7.0",
+  "documentSchemaVersion": "1.5",
+  "reportEngineVersion": "0.1",
+  "releaseDate": "2026-08-16",
+  "status": "release-candidate",
+  "entry": "dist/index.html",
+  "byteSize": 1599413,
+  "sha256": "e0aeb10f251a1dbb3d98d16d5f7d9717257e5f3434d00a2feba623221e4c84c8",
+  "referenceGenerator": {
+    "entry": "artifacts/finance-brief/finance-brief-generator.html",
+    "authoringMode": "independent",
+    "byteSize": 1640799,
+    "sha256": "b30e45a3a9b11125ee68b661a4a8b3545eda75d07a0dea0ec7b864143f7ba9b0"
+  },
+  "referencePdf": {
+    "entry": "artifacts/finance-brief/finance-brief.pdf",
+    "pageCountSource": "artifacts/finance-brief/document.json",
+    "pageCountScope": "finance-brief-reference-only",
+    "note": "PDF 验收页数从本次编译文档的 pages.length 读取；finance-brief 是独立组件数据参考模板，其当前页数不是报告内核上限。",
+    "byteSize": 671368,
+    "sha256": "dc531610652ee534b0c5323bf49220e9c01a5710a5223d1899099567a6b1bf7e"
+  },
+  "engineLimits": {
+    "maximumPages": null,
+    "pageCountPolicy": "报告包至少一页，不设置固定最大页数；实际容量受浏览器内存、图片体积与打印环境约束。"
+  },
+  "authoringModes": {
+    "default": "independent",
+    "newReports": "independent",
+    "legacyCompatibility": "bound",
+    "legacyMissingMode": "bound"
+  },
+  "featureBaseline": "docs/feature-baseline-v1.7.0.md",
+  "contract": "docs/contracts-v1.7.0.md",
+  "research": [
+    "docs/github-skill-research.md",
+    "docs/online-editor-research-v1.4.md",
+    "docs/institutional-report-design-study-v1.4.md"
+  ],
+  "requiredChecks": [
+    "typecheck",
+    "test:migration",
+    "test:engine",
+    "test:assets",
+    "test:overrides",
+    "engine:validate",
+    "engine:compile",
+    "engine:build",
+    "test:dynamic-pages",
+    "check:offline",
+    "check:engine-html",
+    "check:contract",
+    "qa:visual",
+    "engine:pdf",
+    "test:pdf-determinism",
+    "engine:inspect-pdf"
+  ]
+}

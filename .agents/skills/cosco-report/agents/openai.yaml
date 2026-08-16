@@ -1,0 +1,4 @@
+interface:
+  display_name: "中远海运报告规范"
+  short_description: "创建、修改并验证离线可编辑的企业级 PDF 报告生成器"
+  default_prompt: "使用 $cosco-report 盘点脱敏输入，先提交逐页方案，确认后创建或修改可编辑的本地报告并完成 PDF 验证。"
