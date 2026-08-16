@@ -65,7 +65,7 @@ python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-installer/scripts/inst
 | 对齐 | 相对页面/选区六向精确对齐、水平/垂直等间距分布、2.5/5/10 mm 网格、页边距/页面中心/其他元素特征线吸附、屏幕空间阈值、Alt 临时关闭 |
 | 内容 | `text/box/divider/image/chart/table` 六种基础元素；标题、来源、KPI 与引述用文本语义和组合预设表达；文本不存 HTML |
 | 组合 | KPI、重点结论、带标题图表/表格和图片说明；整体选择、移动、复制、删除、锁定、隐藏和拆组，复制时更新 group ID |
-| 数据 | 每个图表/表格直接持有自己的数据；组件旁 TSV 编辑；ECharts SVG；组合图逐系列柱/线与左右轴；系列/类目稳定 ID；五种标签模式；纵横版独立毫米偏移 |
+| 数据 | 每个图表/表格直接持有自己的数据；组件旁单元格编辑；Excel 连续区域从当前格粘贴并按需扩展；可增删行列；ECharts SVG；组合图逐系列柱/线与左右轴；系列/类目稳定 ID；五种标签模式；纵横版独立毫米偏移 |
 | 页面 | 封面、章节、标准、数据、空白、尾页；所有页面类型支持背景图、焦点、主题叠色与双向转换；新建纵横版页面、空页面换向、复制与删除 |
 | 制度元素 | 页眉、页脚、页码、顶部/底部规则线与尾页制度文字均为普通元素，可选择、移动、缩放、对齐、锁定、显隐和排序 |
 | 图片 | 内容图与页面母版图均可直接非破坏裁切、自由/固定比例取景、纯色/渐变/duotone 叠色、混合模式、调色预设、暗角、编辑与打印同构 |
@@ -92,7 +92,8 @@ python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-installer/scripts/inst
 - 拖动时按住 `Alt` 临时关闭吸附。
 - 单选时六向对齐以页面为基准；多选时以整个选区包围盒为基准。水平或垂直等间距分布至少需要三个可移动元素。
 - `Ctrl/Command + 滚轮` 以 5% 步进缩放画布，范围为 50%-200%，并尽量保持鼠标下方的页面位置不变。缩放只影响编辑投影，不修改 mm 坐标。
-- 双击文本或表格单元格可以在画布上直接编辑；选中图表或表格后可从组件旁“编辑数据”打开当前对象的 TSV 编辑器。
+- 双击文本或表格单元格可以在画布上直接编辑；选中图表或表格后可从组件旁“编辑数据”打开当前对象的单元格编辑器。右侧数据面板只显示当前对象的数据规模和入口，不再暴露原始制表符文本。
+- 单元格编辑器可直接改表头、类目、系列名和数值，支持增删行列；从 Excel 复制连续区域后，在目标格粘贴即可从该格向右下展开。`Enter/Shift+Enter` 上下移动，`Ctrl/Command + 方向键` 移动到相邻格。
 - 页内编辑期间粘贴只保留纯文本，中文输入法组合期间不会误触提交或快捷键。`Esc` 放弃整个会话，`Tab` 提交并跳到下一字段，整次页内编辑只产生一条全局撤销记录。
 - 行内只允许粗体和语义红/绿；字体、字号、颜色、对齐与行高使用预设 token，不接受任意 HTML、hex 色值或自由字号。
 - 所有页面类型支持页面级背景图片：章节页使用顶部 70 mm 槽位，其余页面使用整页槽位。背景图固定在最底层，不参与图层和吸附；可与普通图片双向转换，并可双击后直接拖动、滚轮缩放进行非破坏取景。
@@ -100,24 +101,24 @@ python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-installer/scripts/inst
 - 双击内容图片或页面母版图进入非破坏裁切；选择比例后可拖动、滚轮缩放或用八个手柄调整，退出后一次裁切只形成一条历史。原始资产不被裁掉。
 - 图表标签支持 `auto/all/sparse/key/off` 五种模式；人工拖动偏移以毫米保存，并按 `portrait` 与 `landscape` 分支隔离，同一标签用稳定系列 ID 与类目 ID 定位。
 
-## 数据格式
+## 单元格数据
 
-图表数据的第一列是类目，后续列是数据系列：
+智能体根据提示词为每个图表和表格预先创建独立网格。图表的第一列是类目，后续列是系列；例如：
 
-```text
-类目	本期	上年
-1月	92	88
-2月	98	91
-3月	101	96
-```
+| 类目 | 本期 | 上年 |
+| --- | ---: | ---: |
+| 1月 | 92 | 88 |
+| 2月 | 98 | 91 |
+| 3月 | 101 | 96 |
 
-表格数据的第一行是表头，其余行是正文：
+表格的第一行是表头，其余行是正文；例如：
 
-```text
-指标	本期	上期	同比
-营业收入	128.6	118.7	+8.4%
-利润总额	21.4	18.9	+13.2%
-```
+| 指标 | 本期 | 上期 | 同比 |
+| --- | ---: | ---: | ---: |
+| 营业收入 | 128.6 | 118.7 | +8.4% |
+| 利润总额 | 21.4 | 18.9 | +13.2% |
+
+这些表格只是说明网格结构，不是要求用户编写文本格式。实际使用时逐格输入，或把 Excel 连续区域粘贴到选中的单元格。图表数值必须是有限十进制数，错误会标到具体单元格；取消或校验失败不会改动报告。
 
 ## 本地开发
 
@@ -134,6 +135,7 @@ npm run test:overrides
 npm run engine:validate
 npm run engine:compile
 npm run engine:build
+npm run test:cell-grid
 npm run engine:pdf
 npm run test:pdf-determinism
 npm run engine:inspect-pdf
@@ -151,7 +153,7 @@ npm run verify:release
 
 PDF 检查需要 `pdfplumber`、Pillow 和 Poppler。`engine:inspect-pdf` 会依次探测 `CODEX_PYTHON`、Codex 工作区自带 Python 和系统 `python3`，自动选择具备依赖的环境；普通环境可先执行 `python3 -m pip install pdfplumber pillow`，并确保可调用 `pdftoppm`。
 
-`npm run test:migration` 会验证 1.0-1.5 导入、原子化迁移、稳定图表 ID、图片和主题注入。`npm run test:engine` 覆盖派生覆盖、未知绑定、畸形包、报告包图片签名、主题注入、重复事实和脱敏边界。`npm run test:assets` 验证本地 PNG/JPEG/WebP 的 MIME、签名、规范 base64、零 `fetch`、IndexedDB 重校验与报告包命名空间；`npm run test:overrides` 验证数据刷新后的稳定 ID 重放、事实字段/删除/复制三重保护、纵横版标签偏移隔离和孤儿覆盖提示。`npm run engine:compile` 生成本轮 `artifacts/finance-brief/document.json`，`engine:inspect-pdf` 从其中读取页数和逐页方向，不硬编码十页，并逐页验证 A4。`npm run test:pdf-determinism` 会连续打印两次同一特化 HTML 并要求字节完全一致。`npm run check:contract` 会核对应用版本、文档 schema、内核契约和固化产物 SHA-256。`npm run verify:release` 顺序执行完整仓库门禁，实际 PDF 由 `engine:pdf`、可复现性测试和 `engine:inspect-pdf` 联合验收。
+`npm run test:migration` 会验证 1.0-1.5 导入、原子化迁移、稳定图表 ID、图片和主题注入。`npm run test:engine` 覆盖派生覆盖、未知绑定、畸形包、报告包图片签名、主题注入、重复事实和脱敏边界。`npm run test:assets` 验证本地 PNG/JPEG/WebP 的 MIME、签名、规范 base64、零 `fetch`、IndexedDB 重校验与报告包命名空间；`npm run test:overrides` 验证数据刷新后的稳定 ID 重放、事实字段/删除/复制三重保护、纵横版标签偏移隔离和孤儿覆盖提示。`npm run test:cell-grid` 在真实 Chrome 中验证逐格编辑、增删行列、Excel 连续区域粘贴、非法值、取消、两次应用两次撤销、图表隔离、稳定 ID 重排、表格草稿和 390 px 内部滚动。`npm run engine:compile` 生成本轮 `artifacts/finance-brief/document.json`，`engine:inspect-pdf` 从其中读取页数和逐页方向，不硬编码十页，并逐页验证 A4。`npm run test:pdf-determinism` 会连续打印两次同一特化 HTML 并要求字节完全一致。`npm run check:contract` 会核对应用版本、文档 schema、内核契约和固化产物 SHA-256。`npm run verify:release` 顺序执行完整仓库门禁，实际 PDF 由 `engine:pdf`、可复现性测试和 `engine:inspect-pdf` 联合验收。
 
 仓库内的 `scripts/print-pdf.mjs` 使用本机 Chrome DevTools Protocol 的 `preferCSSPageSize` 生成混合纵横版样例，便于在没有打印对话框的环境中复验 CSS 页面尺寸：
 

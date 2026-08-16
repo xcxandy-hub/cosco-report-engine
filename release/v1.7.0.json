@@ -6,13 +6,13 @@
   "releaseDate": "2026-08-16",
   "status": "release-candidate",
   "entry": "dist/index.html",
-  "byteSize": 1599413,
-  "sha256": "e0aeb10f251a1dbb3d98d16d5f7d9717257e5f3434d00a2feba623221e4c84c8",
+  "byteSize": 1617081,
+  "sha256": "1eaac9b55085d7656c1b299aa9b1018730acc3c184953d171300850839d3ca9d",
   "referenceGenerator": {
     "entry": "artifacts/finance-brief/finance-brief-generator.html",
     "authoringMode": "independent",
-    "byteSize": 1640799,
-    "sha256": "b30e45a3a9b11125ee68b661a4a8b3545eda75d07a0dea0ec7b864143f7ba9b0"
+    "byteSize": 1658467,
+    "sha256": "abf4fab46837175a16a98207f2b14709f14e1b8084902ec7f426910671aa3019"
   },
   "referencePdf": {
     "entry": "artifacts/finance-brief/finance-brief.pdf",
@@ -48,6 +48,7 @@
     "engine:validate",
     "engine:compile",
     "engine:build",
+    "test:cell-grid",
     "test:dynamic-pages",
     "check:offline",
     "check:engine-html",

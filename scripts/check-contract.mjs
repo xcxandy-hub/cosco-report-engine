@@ -24,12 +24,14 @@ const [
   reportEngine,
   financePackage,
   reportEngineTest,
+  cellGridTest,
   dynamicPagesTest,
   engineCli,
   printPdf,
   inspectPdf,
   runInspectPdf,
   engineWorkflow,
+  createReportPrompt,
   githubResearch,
   legacyParity,
   visualOverrides,
@@ -54,12 +56,14 @@ const [
   read("src/report-engine.ts"),
   read("report-packages/finance-brief/report-package.json"),
   read("scripts/test-report-engine.mjs"),
+  read("scripts/test-cell-grid.mjs"),
   read("scripts/test-dynamic-pages.mjs"),
   read("scripts/report-engine-cli.mjs"),
   read("scripts/print-pdf.mjs"),
   read("scripts/inspect-pdf.py"),
   read("scripts/run-inspect-pdf.mjs"),
   read(".agents/skills/cosco-report/references/report-engine-workflow.md"),
+  read(".agents/skills/cosco-report/references/prompt-create-report.md"),
   read("docs/github-skill-research.md"),
   read("docs/legacy-finance-parity-v1.5.0.md"),
   read("src/visual-overrides.ts"),
@@ -141,13 +145,17 @@ requireCondition(financeElements.filter((element) => element.type === "chart" &&
 requireCondition(financeElements.some((element) => element.type === "table" && element.table), "independent 财务参考包缺少直接数据表格");
 requireCondition(!financeElements.some((element) => element.contentTemplate || element.chartBinding || element.tableBinding), "independent 财务参考包仍包含绑定");
 requireCondition(reportEngineTest.includes("editing one independent chart does not mutate any other chart") && reportEngineTest.includes("independent-fields") && reportEngineTest.includes("bound-finance-report-package.json"), "内核测试没有同时覆盖独立图表隔离和旧 bound 兼容");
+requireCondition(cellGridTest.includes("第一次撤销没有回到第一次应用") && cellGridTest.includes("Excel 区域粘贴失败") && cellGridTest.includes("系列重排没有携带稳定 ID") && cellGridTest.includes("图 A 修改污染图 B"), "单元格浏览器测试未覆盖逐次撤销、Excel 粘贴、稳定 ID 重排或组件隔离");
 requireCondition(app.includes("suppliedProject={{ document: compiledDocument, assetData: runtimeAssetData }}") && app.includes("浏览器存储不可用，本次内容不会自动保存"), "特化运行时资产或存储失败路径缺失");
 requireCondition(app.includes("validateDocument(compiledDocument, [], { allowTextOnlyMasters: true })") && app.includes('code: "print-quality"'), "特化运行时未复用打印质量检查或未分级为提示");
 requireCondition(app.includes("function IndependentReportRuntime") && app.includes('format: "report-engine-independent-v1"') && app.includes('mode: "independent"'), "独立模板完整文档运行时缺失");
 requireCondition(app.includes('return `local-report-document:${reportPackage.id}`') && app.includes('return `report-package:${reportPackage.id}:independent`'), "独立模板文档或资产没有按报告包命名空间隔离");
 requireCondition(app.includes('? <IndependentReportRuntime bootstrap={bootstrap} />') && app.includes("onProjectChange(document, assetData)") && app.includes("自动保存失败"), "独立模板没有直接进入编辑器或完整文档保存失败路径缺失");
 requireCondition(app.includes("selectedDataElements.length === 1") && app.includes("onEditChartData") && app.includes("onEditTableData") && app.includes("function TableDataDialog"), "组件旁图表/表格数据编辑入口缺失");
-requireCondition(app.includes("请至少输入一行表头") && app.includes("表格必须包含表头，且每一行的列数一致") && app.includes("至少需要一行表头和一行数据"), "图表/表格 TSV 编辑没有完整结构校验");
+requireCondition(app.includes("function CellGridEditor") && app.includes("parseClipboardGrid") && app.includes("打开单元格编辑器"), "图表/表格单元格编辑器或 Excel 区域粘贴入口缺失");
+requireCondition(app.includes("parseStrictChartNumber") && app.includes("MAX_GRID_CELLS") && app.includes("数据网格不是完整矩形") && app.includes("aria-live=\"polite\""), "单元格编辑器缺少数值、容量、矩形或可访问性校验");
+requireCondition(app.includes("pruneChartLabelOffsets") && app.includes("columnLimit={element.chartKind === \"donut\" ? 2") && app.includes('embeddedRef.current?.protectedElementIds.has(id)'), "单元格编辑没有清理标签孤儿、限制环形图或提交时保护 bound 事实");
+requireCondition(engineWorkflow.includes("按任务书预建行、列、表头、类目和系列") && createReportPrompt.includes("每个数据组件都要逐项填写"), "Skill 没有要求智能体按提示词预建单元格结构");
 requireCondition(app.includes('event.key.toLowerCase() === "p"') && app.includes('addEventListener("beforeprint"') && app.includes("setPrintDocument(document)") && app.includes("preparedPrintRef.current"), "直接浏览器打印没有同步当前文档或没有保护正式打印副本");
 requireCondition(engineCli.includes("createPreviewData(reportPackage, data)") && engineCli.includes("previewResult") && engineCli.includes("Content-Security-Policy") && engineCli.includes("checkOfflineHtml"), "特化构建脱敏复编译、CSP 或最终离线检查缺失");
 requireCondition(engineCli.includes("--trusted-code") && engineCli.includes("trustedPackageRoot"), "CLI 未显式隔离可信 .mjs 作者源码");
@@ -160,6 +168,7 @@ requireCondition(inspectPdf.includes('"expectedOrientation"') && inspectPdf.incl
 requireCondition(packageJson.scripts["verify:release"].includes("test:assets") && packageJson.scripts["verify:release"].includes("test:overrides"), "发布门禁未包含资产与视觉覆盖测试");
 requireCondition(manifest.requiredChecks?.includes("engine:compile") && packageJson.scripts["verify:release"].includes("engine:compile"), "发布清单或发布门禁缺少报告文档编译步骤");
 requireCondition(manifest.requiredChecks?.includes("test:dynamic-pages") && packageJson.scripts["verify:release"].includes("test:dynamic-pages"), "发布清单或发布门禁缺少动态页数 PDF 测试");
+requireCondition(manifest.requiredChecks?.includes("test:cell-grid") && packageJson.scripts["verify:release"].includes("test:cell-grid"), "发布清单或发布门禁缺少单元格浏览器测试");
 requireCondition(dynamicPagesTest.includes("length: 20") && dynamicPagesTest.includes('index % 2 === 0 ? "portrait" : "landscape"') && dynamicPagesTest.includes("run-inspect-pdf.mjs") && dynamicPagesTest.includes("a4Matched"), "动态页数测试没有覆盖 20 页、混合方向、真实 PDF 或逐页 A4 检查");
 for (const source of ["agentskills/agentskills", "pdfme/pdfme", "garrytan/gstack", "daymade/claude-code-skills", "microsoft/playwright", "pagedjs/pagedjs", "vivliostyle/vivliostyle.js"]) requireCondition(githubResearch.includes(source), `GitHub 调研缺少 ${source}`);
 for (const gap of ["期间滚动", "多口径快照", "单位存储", "风险快照", "外汇日序列", "页面启停"]) requireCondition(legacyParity.includes(gap), `旧版承接矩阵缺少 ${gap}`);

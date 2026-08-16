@@ -1,6 +1,8 @@
 import {
   ChangeEvent,
+  ClipboardEvent as ReactClipboardEvent,
   CSSProperties,
+  KeyboardEvent as ReactKeyboardEvent,
   PointerEvent as ReactPointerEvent,
   useEffect,
   useMemo,
@@ -152,6 +154,12 @@ const MAX_PROJECT_JSON_BYTES = 80 * 1024 * 1024;
 const MAX_PROJECT_DOCUMENT_BYTES = 10 * 1024 * 1024;
 const MAX_PROJECT_UNCOMPRESSED_BYTES = 64 * 1024 * 1024;
 const MAX_PROJECT_ARCHIVE_ENTRIES = 512;
+const MAX_GRID_ROWS = 300;
+const MAX_GRID_COLUMNS = 50;
+const MAX_GRID_CELLS = 5000;
+const MAX_GRID_CELL_CHARS = 10000;
+const MAX_GRID_TOTAL_CHARS = 1024 * 1024;
+const MAX_CHART_ABS_VALUE = 1e15;
 const ICON_STROKE = 1.75;
 const BASE_PX_PER_MM = 3.05;
 const chartInstances = new Set<echarts.ECharts>();
@@ -528,63 +536,223 @@ function cleanFilename(value: string) {
   return value.replace(/[\\/:*?"<>|]/g, "-").trim() || "未命名报告";
 }
 
-function chartToTsv(chart?: ChartData) {
-  if (!chart) return "";
-  const header = ["类目", ...chart.series.map((series) => series.name)].join("\t");
-  const rows = chart.categories.map((category, index) =>
-    [category, ...chart.series.map((series) => series.values[index] ?? "")].join("\t")
-  );
-  return [header, ...rows].join("\n");
+type CellGridKind = "chart" | "table";
+
+interface CellGridDraft {
+  cells: string[][];
+  rowKeys: string[];
+  columnKeys: string[];
 }
 
-function parseChartTsv(value: string, previous?: ChartData): { chart?: ChartData; error?: string } {
-  const lines = value.replace(/\r/g, "").split("\n").filter((line, index, rows) => line.trim() || (index > 0 && index < rows.length - 1));
-  if (lines.length < 2) return { error: "至少需要一行表头和一行数据" };
-  const cells = lines.map((line) => line.split("\t"));
-  const width = cells[0].length;
-  if (width < 2) return { error: "表头至少需要“类目”和一个系列" };
-  const uneven = cells.findIndex((row) => row.length !== width);
-  if (uneven >= 0) return { error: `第 ${uneven + 1} 行有 ${cells[uneven].length} 列，应为 ${width} 列` };
-  const seriesNames = cells[0].slice(1).map((name, index) => name.trim() || `系列${index + 1}`);
-  const categories = cells.slice(1).map((row, index) => row[0].trim() || `未命名 ${index + 1}`);
-  for (let rowIndex = 1; rowIndex < cells.length; rowIndex += 1) {
-    for (let columnIndex = 1; columnIndex < width; columnIndex += 1) {
-      const raw = cells[rowIndex][columnIndex].trim();
-      if (!raw) return { error: `第 ${rowIndex + 1} 行第 ${columnIndex + 1} 列为空；请填写数值，零请明确输入 0` };
-      if (!Number.isFinite(Number(raw))) return { error: `第 ${rowIndex + 1} 行第 ${columnIndex + 1} 列“${raw}”不是有效数值` };
+interface CellGridValidation {
+  cellErrors: Map<string, string>;
+  message: string;
+  valid: boolean;
+}
+
+const gridCellKey = (row: number, column: number) => `${row}:${column}`;
+
+function stableGridKey(candidate: string | undefined, prefix: string, used: Set<string>) {
+  const key = candidate && !used.has(candidate) ? candidate : `${prefix}-${uid()}`;
+  used.add(key);
+  return key;
+}
+
+function chartToCellGrid(chart: ChartData): CellGridDraft {
+  const usedRows = new Set<string>(["header"]);
+  const usedColumns = new Set<string>(["category"]);
+  const cells = [
+    ["类目", ...chart.series.map((series) => series.name)],
+    ...chart.categories.map((category, index) => [category, ...chart.series.map((series) => String(series.values[index] ?? ""))])
+  ];
+  return {
+    cells,
+    rowKeys: ["header", ...chart.categories.map((_, index) => stableGridKey(chart.categoryIds?.[index], "point", usedRows))],
+    columnKeys: ["category", ...chart.series.map((series) => stableGridKey(series.id, "series", usedColumns))]
+  };
+}
+
+function tableToCellGrid(table: TableData): CellGridDraft {
+  return {
+    cells: [table.headers, ...table.rows].map((row) => row.map(String)),
+    rowKeys: ["header", ...table.rows.map(() => `row-${uid()}`)],
+    columnKeys: table.headers.map(() => `column-${uid()}`)
+  };
+}
+
+function cellGridValidation(kind: CellGridKind, draft: CellGridDraft): CellGridValidation {
+  const errors = new Map<string, string>();
+  const rows = draft.cells.length;
+  const columns = Math.max(0, ...draft.cells.map((row) => row.length));
+  const totalCharacters = draft.cells.reduce((total, row) => total + row.reduce((sum, cell) => sum + cell.length, 0), 0);
+  if (rows > MAX_GRID_ROWS || columns > MAX_GRID_COLUMNS || rows * columns > MAX_GRID_CELLS || totalCharacters > MAX_GRID_TOTAL_CHARS || draft.cells.some((row) => row.some((cell) => cell.length > MAX_GRID_CELL_CHARS))) {
+    return { cellErrors: errors, message: `数据超过 ${MAX_GRID_ROWS - 1} 行、${MAX_GRID_COLUMNS} 列或 ${MAX_GRID_CELLS} 格安全上限`, valid: false };
+  }
+  if (rows < 2) return { cellErrors: errors, message: "至少保留一行表头和一行数据", valid: false };
+  if (columns < (kind === "chart" ? 2 : 1)) return { cellErrors: errors, message: kind === "chart" ? "图表至少需要一个类目列和一个数据系列" : "表格至少需要一列", valid: false };
+  if (draft.cells.some((row) => row.length !== columns)) return { cellErrors: errors, message: "数据网格不是完整矩形，请重新粘贴连续的 Excel 区域", valid: false };
+  if (draft.rowKeys.length !== rows || draft.columnKeys.length !== columns || new Set(draft.rowKeys).size !== draft.rowKeys.length || new Set(draft.columnKeys).size !== draft.columnKeys.length) {
+    return { cellErrors: errors, message: "数据网格的稳定行列标识重复或缺失", valid: false };
+  }
+  draft.cells[0].forEach((value, column) => {
+    if (!value.trim()) errors.set(gridCellKey(0, column), kind === "chart" && column === 0 ? "请填写类目列名称" : "请填写列名称");
+  });
+  if (kind === "chart") {
+    draft.cells.slice(1).forEach((row, rowOffset) => {
+      const rowIndex = rowOffset + 1;
+      if (!row[0].trim()) errors.set(gridCellKey(rowIndex, 0), "请填写类目名称");
+      row.slice(1).forEach((value, columnOffset) => {
+        const columnIndex = columnOffset + 1;
+        const raw = value.trim();
+        if (!raw) errors.set(gridCellKey(rowIndex, columnIndex), "请填写数值，零请明确输入 0");
+        else {
+          const parsed = parseStrictChartNumber(raw);
+          if (parsed === null) errors.set(gridCellKey(rowIndex, columnIndex), `“${raw.slice(0, 36)}${raw.length > 36 ? "…" : ""}”不是有效的有限十进制数`);
+        }
+      });
+    });
+  }
+  const firstError = errors.values().next().value as string | undefined;
+  return {
+    cellErrors: errors,
+    message: firstError ? `${errors.size} 个单元格需要修改：${firstError}` : `已识别 ${columns} 列、${rows - 1} 行数据`,
+    valid: errors.size === 0
+  };
+}
+
+function parseStrictChartNumber(value: string) {
+  const raw = value.trim();
+  if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(raw)) return null;
+  const parsed = Number(raw);
+  return Number.isFinite(parsed) && Math.abs(parsed) <= MAX_CHART_ABS_VALUE ? parsed : null;
+}
+
+function parseClipboardGrid(value: string): { cells?: string[][]; error?: string } {
+  if (value.length > MAX_GRID_TOTAL_CHARS) return { error: "剪贴板内容超过 1 MB，已拒绝粘贴" };
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let cell = "";
+  let quoted = false;
+  let afterQuote = false;
+  let parseError = "";
+  const pushCell = () => {
+    if (cell.length > MAX_GRID_CELL_CHARS) { parseError = `单个单元格不能超过 ${MAX_GRID_CELL_CHARS} 个字符`; return; }
+    if (row.length >= MAX_GRID_COLUMNS) { parseError = `粘贴区域不能超过 ${MAX_GRID_COLUMNS} 列`; return; }
+    row.push(cell);
+    cell = "";
+    afterQuote = false;
+  };
+  const pushRow = () => {
+    pushCell();
+    if (parseError) return;
+    if (rows.length >= MAX_GRID_ROWS) { parseError = `粘贴区域不能超过 ${MAX_GRID_ROWS} 行`; return; }
+    rows.push(row);
+    row = [];
+  };
+  for (let index = 0; index < value.length; index += 1) {
+    const char = value[index];
+    if (quoted) {
+      if (char === '"' && value[index + 1] === '"') { cell += '"'; index += 1; }
+      else if (char === '"') { quoted = false; afterQuote = true; }
+      else cell += char;
+      if (cell.length > MAX_GRID_CELL_CHARS) return { error: `单个单元格不能超过 ${MAX_GRID_CELL_CHARS} 个字符` };
+      continue;
+    }
+    if (char === '"' && !cell) { quoted = true; continue; }
+    if (afterQuote && !["\t", "\r", "\n"].includes(char)) return { error: "Excel 引号单元格格式不完整，未执行粘贴" };
+    if (char === "\t") { pushCell(); if (parseError) return { error: parseError }; continue; }
+    if (char === "\r" || char === "\n") {
+      if (char === "\r" && value[index + 1] === "\n") index += 1;
+      pushRow();
+      if (parseError) return { error: parseError };
+      continue;
+    }
+    cell += char;
+    if (cell.length > MAX_GRID_CELL_CHARS) return { error: `单个单元格不能超过 ${MAX_GRID_CELL_CHARS} 个字符` };
+  }
+  if (quoted) return { error: "Excel 引号单元格没有闭合，未执行粘贴" };
+  if (cell || row.length || !rows.length) { pushRow(); if (parseError) return { error: parseError }; }
+  if (rows.length > 1 && rows.at(-1)?.length === 1 && rows.at(-1)?.[0] === "") rows.pop();
+  const width = rows[0]?.length || 0;
+  if (!width || rows.some((item) => item.length !== width)) return { error: "粘贴区域的每一行列数不同，未执行粘贴" };
+  if (rows.some((item) => item.some((itemCell) => /[\t\r\n]/.test(itemCell)))) return { error: "单个 Excel 单元格内含换行或制表符，当前报告表格不支持，未执行粘贴" };
+  if (rows.some((item) => item.some((itemCell) => itemCell.length > MAX_GRID_CELL_CHARS))) return { error: `单个单元格不能超过 ${MAX_GRID_CELL_CHARS} 个字符` };
+  return { cells: rows };
+}
+
+function reconcilePastedStableKeys(kind: CellGridKind, before: CellGridDraft, next: CellGridDraft, startRow: number, startColumn: number, blockRows: number, blockColumns: number) {
+  if (kind !== "chart") return;
+  const uniqueNameMap = (names: string[], keys: string[]) => {
+    const counts = new Map<string, number>();
+    names.forEach((name) => counts.set(name, (counts.get(name) || 0) + 1));
+    return new Map(names.flatMap((name, index) => counts.get(name) === 1 ? [[name, keys[index]]] : []));
+  };
+  if (startColumn === 0 && startRow < next.cells.length && startRow + blockRows > 1) {
+    const beforeNames = before.cells.slice(1).map((row) => row[0]);
+    const nextNames = next.cells.slice(1).map((row) => row[0]);
+    const beforeByName = uniqueNameMap(beforeNames, before.rowKeys.slice(1));
+    const isPureReorder = beforeNames.length === nextNames.length && new Set(beforeNames).size === beforeNames.length && new Set(nextNames).size === nextNames.length && nextNames.every((name) => beforeByName.has(name));
+    if (isPureReorder) next.rowKeys = ["header", ...nextNames.map((name) => beforeByName.get(name)!)];
+    else {
+      const firstAffected = Math.max(1, startRow);
+      const lastAffected = Math.min(next.cells.length, startRow + blockRows);
+      for (let rowIndex = firstAffected; rowIndex < lastAffected; rowIndex += 1) {
+        if (before.cells[rowIndex] && before.cells[rowIndex][0] !== next.cells[rowIndex][0]) next.rowKeys[rowIndex] = `point-${uid()}`;
+      }
     }
   }
-  const categoryIds = categories.map((category, index) => previous?.categories[index] === category && previous.categoryIds?.[index]
-    ? previous.categoryIds[index]
-    : `point-${uid()}`);
-  const series = seriesNames.map((name, seriesIndex) => {
-    const before = previous?.series[seriesIndex];
+  if (startRow === 0 && startColumn < next.cells[0].length && startColumn + blockColumns > 1) {
+    const beforeNames = before.cells[0].slice(1);
+    const nextNames = next.cells[0].slice(1);
+    const beforeByName = uniqueNameMap(beforeNames, before.columnKeys.slice(1));
+    const isPureReorder = beforeNames.length === nextNames.length && new Set(beforeNames).size === beforeNames.length && new Set(nextNames).size === nextNames.length && nextNames.every((name) => beforeByName.has(name));
+    if (isPureReorder) next.columnKeys = ["category", ...nextNames.map((name) => beforeByName.get(name)!)];
+    else {
+      const firstAffected = Math.max(1, startColumn);
+      const lastAffected = Math.min(next.cells[0].length, startColumn + blockColumns);
+      for (let columnIndex = firstAffected; columnIndex < lastAffected; columnIndex += 1) {
+        if (before.cells[0][columnIndex] !== next.cells[0][columnIndex]) next.columnKeys[columnIndex] = `series-${uid()}`;
+      }
+    }
+  }
+}
+
+function chartFromCellGrid(draft: CellGridDraft, previous: ChartData, chartKind?: ReportElement["chartKind"]): ChartData {
+  const categories = draft.cells.slice(1).map((row) => row[0].trim());
+  const series = draft.cells[0].slice(1).map((name, seriesIndex, names) => {
+    const id = draft.columnKeys[seriesIndex + 1] || `series-${uid()}`;
+    const before = previous.series.find((item) => item.id === id);
+    const defaultComboKind = seriesIndex === names.length - 1 ? "line" : "bar";
     return {
-      id: before?.name === name && before.id ? before.id : `series-${uid()}`,
-      name,
-      values: cells.slice(1).map((row) => Number(row[seriesIndex + 1])),
-      kind: before?.kind,
-      axis: before?.axis,
-      unit: before?.unit
+      id,
+      name: name.trim(),
+      values: draft.cells.slice(1).map((row) => parseStrictChartNumber(row[seriesIndex + 1])!),
+      kind: before?.kind || (chartKind === "combo" ? defaultComboKind : undefined),
+      axis: before?.axis || (chartKind === "combo" ? (defaultComboKind === "line" ? "right" : "left") : undefined),
+      unit: before?.unit || ""
     };
   });
-  return { chart: { categories, categoryIds, series } };
+  return { categories, categoryIds: draft.rowKeys.slice(1), series };
 }
 
-function tableToTsv(element?: ReportElement) {
-  if (!element?.table) return "";
-  return [element.table.headers, ...element.table.rows].map((row) => row.join("\t")).join("\n");
+function tableFromCellGrid(draft: CellGridDraft): TableData {
+  return {
+    headers: draft.cells[0].map((cell) => cell.trim()),
+    rows: draft.cells.slice(1).map((row) => row.map((cell) => cell.trim()))
+  };
 }
 
-function tsvToTable(value: string) {
-  if (!value.trim()) return null;
-  const lines = value
-    .trim()
-    .split(/\r?\n/)
-    .map((line) => line.split("\t").map((cell) => cell.trim()));
-  const width = lines[0]?.length || 0;
-  if (lines.length < 2 || width < 1 || lines[0].some((cell) => !cell) || lines.some((row) => row.length !== width)) return null;
-  return { headers: lines[0], rows: lines.slice(1) };
+function pruneChartLabelOffsets(element: ReportElement, chart: ChartData) {
+  if (!element.chartLabels?.offsets) return;
+  const validKeys = new Set(chart.series.flatMap((series) => chart.categoryIds!.map((pointId) => chartPointKey(series.id!, pointId))));
+  const offsets = clone(element.chartLabels.offsets);
+  (["portrait", "landscape"] as const).forEach((orientation) => {
+    const byOrientation = offsets[orientation];
+    if (!byOrientation) return;
+    Object.keys(byOrientation).forEach((key) => { if (!validKeys.has(key)) delete byOrientation[key]; });
+    if (!Object.keys(byOrientation).length) delete offsets[orientation];
+  });
+  element.chartLabels.offsets = offsets;
 }
 
 function resolveThemeColor(theme: ReportDocument["theme"], token: string | undefined, fallback: "text" | "paper" | "line" = "text") {
@@ -2197,21 +2365,289 @@ function ObjectToolbar({
   </div>;
 }
 
+function CellGridEditor({ kind, draft, readOnly, columnLimit = MAX_GRID_COLUMNS, onChange }: {
+  kind: CellGridKind;
+  draft: CellGridDraft;
+  readOnly: boolean;
+  columnLimit?: number;
+  onChange: (draft: CellGridDraft) => void;
+}) {
+  const [activeCell, setActiveCell] = useState("0:0");
+  const [actionMessage, setActionMessage] = useState("");
+  const validation = useMemo(() => cellGridValidation(kind, draft), [draft, kind]);
+  const columnCount = draft.cells[0]?.length || 0;
+  const widestRow = Math.max(0, ...draft.cells.map((row) => row.length));
+  const totalCharacters = draft.cells.reduce((total, row) => total + row.reduce((sum, cell) => sum + cell.length, 0), 0);
+  const [activeRow, activeColumn] = activeCell.split(":").map(Number);
+  const sizeError = draft.cells.length > MAX_GRID_ROWS || widestRow > MAX_GRID_COLUMNS || draft.cells.length * widestRow > MAX_GRID_CELLS || totalCharacters > MAX_GRID_TOTAL_CHARS || draft.cells.some((row) => row.some((cell) => cell.length > MAX_GRID_CELL_CHARS))
+    ? `当前数据为 ${draft.cells.length - 1} 行 × ${columnCount} 列，超过单元格编辑器的 ${MAX_GRID_ROWS - 1} 行、${MAX_GRID_COLUMNS} 列或 ${MAX_GRID_CELLS} 格安全上限。请将数据拆分为多个独立图表或表格。`
+    : "";
+
+  const commitDraft = (recipe: (next: CellGridDraft) => void) => {
+    const next = clone(draft);
+    recipe(next);
+    const nextColumns = Math.max(0, ...next.cells.map((row) => row.length));
+    const nextCharacters = next.cells.reduce((total, row) => total + row.reduce((sum, cell) => sum + cell.length, 0), 0);
+    if (next.cells.length > MAX_GRID_ROWS || nextColumns > MAX_GRID_COLUMNS || next.cells.length * nextColumns > MAX_GRID_CELLS || nextCharacters > MAX_GRID_TOTAL_CHARS) {
+      setActionMessage(`修改后将超过 ${MAX_GRID_ROWS - 1} 行、${MAX_GRID_COLUMNS} 列、${MAX_GRID_CELLS} 格或 1 MB 文本上限`);
+      return false;
+    }
+    onChange(next);
+    return true;
+  };
+
+  const focusCell = (row: number, column: number) => {
+    window.requestAnimationFrame(() => {
+      document.querySelector<HTMLInputElement>(`.cell-grid-input[data-row="${row}"][data-column="${column}"]`)?.focus();
+    });
+  };
+
+  const addRow = () => {
+    if (draft.cells.length >= MAX_GRID_ROWS || (draft.cells.length + 1) * columnCount > MAX_GRID_CELLS) {
+      setActionMessage(`最多支持 ${MAX_GRID_ROWS} 行、合计 ${MAX_GRID_CELLS} 个单元格`);
+      return;
+    }
+    commitDraft((next) => {
+      const rowNumber = next.cells.length;
+      next.cells.push(Array.from({ length: columnCount }, (_, column) => kind === "chart" ? (column === 0 ? `新类目 ${rowNumber}` : "0") : ""));
+      next.rowKeys.push(`row-${uid()}`);
+    });
+    setActionMessage("已新增一行");
+    focusCell(draft.cells.length, 0);
+  };
+
+  const addColumn = () => {
+    if (columnCount >= columnLimit || draft.cells.length * (columnCount + 1) > MAX_GRID_CELLS) {
+      setActionMessage(columnLimit < MAX_GRID_COLUMNS ? "环形图固定使用一列数值系列" : `最多支持 ${MAX_GRID_COLUMNS} 列、合计 ${MAX_GRID_CELLS} 个单元格`);
+      return;
+    }
+    commitDraft((next) => {
+      const nextColumn = columnCount;
+      next.cells.forEach((row, rowIndex) => row.push(rowIndex === 0 ? (kind === "chart" ? `系列 ${nextColumn}` : `列 ${nextColumn + 1}`) : kind === "chart" ? "0" : ""));
+      next.columnKeys.push(`column-${uid()}`);
+    });
+    setActionMessage("已新增一列");
+    focusCell(0, columnCount);
+  };
+
+  const removeRow = (rowIndex: number) => {
+    if (draft.cells.length <= 2) return;
+    commitDraft((next) => {
+      next.cells.splice(rowIndex, 1);
+      next.rowKeys.splice(rowIndex, 1);
+    });
+    setActionMessage(`已删除第 ${rowIndex} 行数据`);
+  };
+
+  const removeColumn = (columnIndex: number) => {
+    const minimum = kind === "chart" ? 2 : 1;
+    if (columnCount <= minimum || (kind === "chart" && columnIndex === 0)) return;
+    commitDraft((next) => {
+      next.cells.forEach((row) => row.splice(columnIndex, 1));
+      next.columnKeys.splice(columnIndex, 1);
+    });
+    setActionMessage(`已删除“${draft.cells[0][columnIndex]}”列`);
+  };
+
+  const updateCell = (row: number, column: number, value: string) => {
+    if (value.length > MAX_GRID_CELL_CHARS) {
+      setActionMessage(`单个单元格不能超过 ${MAX_GRID_CELL_CHARS} 个字符`);
+      return;
+    }
+    if (!commitDraft((next) => { next.cells[row][column] = value; })) return;
+    setActionMessage("");
+  };
+
+  const pasteCells = (event: ReactClipboardEvent<HTMLInputElement>, startRow: number, startColumn: number) => {
+    if (readOnly) return;
+    const clipboard = event.clipboardData.getData("text/plain");
+    if (clipboard.length > 1024 * 1024) {
+      event.preventDefault();
+      setActionMessage("剪贴板内容超过 1 MB，已拒绝粘贴；请拆分后重试");
+      return;
+    }
+    if (!clipboard.includes("\t") && !/[\r\n]/.test(clipboard)) return;
+    event.preventDefault();
+    const parsedClipboard = parseClipboardGrid(clipboard);
+    if (!parsedClipboard.cells) {
+      setActionMessage(parsedClipboard.error || "剪贴板数据无法识别，未执行粘贴");
+      return;
+    }
+    const block = parsedClipboard.cells;
+    const blockColumns = Math.max(0, ...block.map((row) => row.length));
+    const requiredRows = startRow + block.length;
+    const requiredColumns = startColumn + blockColumns;
+    const finalRows = Math.max(draft.cells.length, requiredRows);
+    const finalColumns = Math.max(columnCount, requiredColumns);
+    if (!block.length || !blockColumns) return;
+    if (finalRows > MAX_GRID_ROWS || finalColumns > columnLimit || finalRows * finalColumns > MAX_GRID_CELLS) {
+      setActionMessage(columnLimit < MAX_GRID_COLUMNS && requiredColumns > columnLimit ? "环形图只接受一列数值系列" : `粘贴范围过大；最多 ${MAX_GRID_ROWS} 行、${MAX_GRID_COLUMNS} 列、合计 ${MAX_GRID_CELLS} 个单元格`);
+      return;
+    }
+    commitDraft((next) => {
+      while (next.cells.length < requiredRows) {
+        const rowNumber = next.cells.length;
+        next.cells.push(Array.from({ length: next.cells[0].length }, (_, column) => kind === "chart" ? (column === 0 ? `新类目 ${rowNumber}` : "0") : ""));
+        next.rowKeys.push(`row-${uid()}`);
+      }
+      while (next.cells[0].length < requiredColumns) {
+        const nextColumn = next.cells[0].length;
+        next.cells.forEach((row, rowIndex) => row.push(rowIndex === 0 ? (kind === "chart" ? `系列 ${nextColumn}` : `列 ${nextColumn + 1}`) : kind === "chart" ? "0" : ""));
+        next.columnKeys.push(`column-${uid()}`);
+      }
+      block.forEach((row, rowOffset) => row.forEach((value, columnOffset) => {
+        next.cells[startRow + rowOffset][startColumn + columnOffset] = value;
+      }));
+      reconcilePastedStableKeys(kind, draft, next, startRow, startColumn, block.length, blockColumns);
+    });
+    setActionMessage(`已从当前格粘贴 ${block.length} 行 × ${blockColumns} 列`);
+    focusCell(Math.min(requiredRows - 1, MAX_GRID_ROWS - 1), Math.min(requiredColumns - 1, MAX_GRID_COLUMNS - 1));
+  };
+
+  const handleCellKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>, row: number, column: number) => {
+    if (event.nativeEvent.isComposing || event.keyCode === 229) return;
+    let nextRow = row;
+    let nextColumn = column;
+    if (event.key === "Enter") nextRow = Math.max(0, Math.min(draft.cells.length - 1, row + (event.shiftKey ? -1 : 1)));
+    else if ((event.metaKey || event.ctrlKey) && event.key === "ArrowDown") nextRow = Math.min(draft.cells.length - 1, row + 1);
+    else if ((event.metaKey || event.ctrlKey) && event.key === "ArrowUp") nextRow = Math.max(0, row - 1);
+    else if ((event.metaKey || event.ctrlKey) && event.key === "ArrowRight") nextColumn = Math.min(columnCount - 1, column + 1);
+    else if ((event.metaKey || event.ctrlKey) && event.key === "ArrowLeft") nextColumn = Math.max(0, column - 1);
+    else return;
+    event.preventDefault();
+    focusCell(nextRow, nextColumn);
+  };
+
+  if (sizeError) return <div className="cell-grid-editor"><div className="cell-grid-limit">{sizeError}</div></div>;
+
+  return <div className="cell-grid-editor" data-grid-kind={kind}>
+    <div className="cell-grid-toolbar">
+      <span>{kind === "chart" ? "首列为类目，后续列为数据系列" : "首行为表头，其余行为数据"}</span>
+      {!readOnly && <div>
+        <button type="button" onClick={addRow}><Plus size={14} />新增行</button>
+        {columnCount < columnLimit && <button type="button" onClick={addColumn}><Plus size={14} />新增列</button>}
+        <button type="button" disabled={!Number.isFinite(activeRow) || activeRow < 1 || draft.cells.length <= 2} onClick={() => removeRow(activeRow)}><Trash2 size={13} />删除行</button>
+        <button type="button" disabled={!Number.isFinite(activeColumn) || (kind === "chart" && activeColumn === 0) || columnCount <= (kind === "chart" ? 2 : 1)} onClick={() => removeColumn(activeColumn)}><Trash2 size={13} />删除列</button>
+      </div>}
+    </div>
+    <div className="cell-grid-scroll" tabIndex={-1}>
+      <table className="cell-grid-table">
+        <thead><tr>
+          <th className="cell-grid-corner" aria-label="行号" />
+          {draft.cells[0].map((cell, column) => {
+            const error = validation.cellErrors.get(gridCellKey(0, column));
+            const canDelete = columnCount > (kind === "chart" ? 2 : 1) && !(kind === "chart" && column === 0);
+            return <th key={draft.columnKeys[column] || column} className={activeCell === gridCellKey(0, column) ? "active" : ""}>
+              <div className="cell-grid-header-cell">
+                <input
+                  className="cell-grid-input"
+                  data-row="0"
+                  data-column={column}
+                  data-column-key={draft.columnKeys[column]}
+                  aria-label={kind === "chart" && column === 0 ? "类目列名称" : `第 ${column + 1} 列名称`}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? "cell-grid-validation-status" : undefined}
+                  title={error}
+                  value={cell}
+                  maxLength={MAX_GRID_CELL_CHARS}
+                  readOnly={readOnly}
+                  spellCheck={false}
+                  onFocus={() => setActiveCell(gridCellKey(0, column))}
+                  onChange={(event) => updateCell(0, column, event.target.value)}
+                  onPaste={(event) => pasteCells(event, 0, column)}
+                  onKeyDown={(event) => handleCellKeyDown(event, 0, column)}
+                />
+                {!readOnly && canDelete && <button type="button" tabIndex={-1} title="删除本列" aria-label={`删除“${cell || `第 ${column + 1} 列`}”`} onClick={() => removeColumn(column)}><Trash2 size={13} /></button>}
+              </div>
+            </th>;
+          })}
+        </tr></thead>
+        <tbody>{draft.cells.slice(1).map((row, rowOffset) => {
+          const rowIndex = rowOffset + 1;
+          return <tr key={draft.rowKeys[rowIndex] || rowIndex}>
+            <th className="cell-grid-row-control"><span>{rowIndex}</span>{!readOnly && <button type="button" tabIndex={-1} title="删除本行" aria-label={`删除第 ${rowIndex} 行`} disabled={draft.cells.length <= 2} onClick={() => removeRow(rowIndex)}><Trash2 size={12} /></button>}</th>
+            {row.map((cell, column) => {
+              const error = validation.cellErrors.get(gridCellKey(rowIndex, column));
+              return <td key={draft.columnKeys[column] || column} className={activeCell === gridCellKey(rowIndex, column) ? "active" : ""}>
+                <input
+                  className="cell-grid-input"
+                  data-row={rowIndex}
+                  data-column={column}
+                  data-row-key={draft.rowKeys[rowIndex]}
+                  data-column-key={draft.columnKeys[column]}
+                  aria-label={`第 ${rowIndex} 行，第 ${column + 1} 列`}
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? "cell-grid-validation-status" : undefined}
+                  title={error}
+                  value={cell}
+                  maxLength={MAX_GRID_CELL_CHARS}
+                  readOnly={readOnly}
+                  spellCheck={false}
+                  onFocus={() => setActiveCell(gridCellKey(rowIndex, column))}
+                  onChange={(event) => updateCell(rowIndex, column, event.target.value)}
+                  onPaste={(event) => pasteCells(event, rowIndex, column)}
+                  onKeyDown={(event) => handleCellKeyDown(event, rowIndex, column)}
+                />
+              </td>;
+            })}
+          </tr>;
+        })}</tbody>
+      </table>
+    </div>
+    <div className="cell-grid-status" aria-live="polite">
+      <span id="cell-grid-validation-status" className={validation.valid ? "ready" : "error"}>{validation.message}</span>
+      <span>{actionMessage || (!readOnly ? "可从 Excel 复制多格后粘贴到当前单元格" : "只读数据")}</span>
+    </div>
+  </div>;
+}
+
+function useDialogFocus(onClose: () => void) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const frame = window.requestAnimationFrame(() => (dialogRef.current?.querySelector<HTMLElement>(".cell-grid-input") || dialogRef.current?.querySelector<HTMLElement>("button"))?.focus());
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab" || !dialogRef.current) return;
+      const focusable = [...dialogRef.current.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+        .filter((item) => item.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.removeEventListener("keydown", onKeyDown);
+      if (returnFocus?.isConnected) returnFocus.focus();
+    };
+  }, [onClose]);
+  return dialogRef;
+}
+
 function ChartDataDialog({ element, readOnly, onClose, onSave }: {
   element: ReportElement;
   readOnly: boolean;
   onClose: () => void;
   onSave: (chart: ChartData) => void;
 }) {
-  const [value, setValue] = useState(() => chartToTsv(element.chart));
-  const parsed = useMemo(() => parseChartTsv(value, element.chart), [element.chart, value]);
+  const [draft, setDraft] = useState(() => chartToCellGrid(element.chart!));
+  const validation = useMemo(() => cellGridValidation("chart", draft), [draft]);
+  const donutError = element.chartKind === "donut" && draft.cells[0].length !== 2 ? "环形图只能保留一列数值系列" : "";
+  const dialogRef = useDialogFocus(onClose);
   return <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
-    <div className="validation-dialog chart-data-dialog" role="dialog" aria-modal="true" aria-labelledby="chart-data-title" onMouseDown={(event) => event.stopPropagation()}>
+    <div ref={dialogRef} className="validation-dialog chart-data-dialog" role="dialog" aria-modal="true" aria-labelledby="chart-data-title" onMouseDown={(event) => event.stopPropagation()}>
       <div className="dialog-title"><div><h2 id="chart-data-title">{readOnly ? "查看图表数据" : "编辑图表数据"}</h2><small>{element.name}</small></div><IconButton label="关闭" onClick={onClose}><X size={17} /></IconButton></div>
-      {readOnly && <p className="bound-data-note"><Lock size={14} />该图表绑定本地录入字段或派生公式。请在“本地数据”中修改事实数据；这里仅查看，标签和位置仍可精修。</p>}
-      <textarea className="chart-data-editor" value={value} readOnly={readOnly} spellCheck={false} onChange={(event) => setValue(event.target.value)} />
-      {!readOnly && <p className={parsed.error ? "dialog-validation error" : "dialog-validation ready"}>{parsed.error || `已识别 ${parsed.chart?.categories.length || 0} 个类目、${parsed.chart?.series.length || 0} 个系列`}</p>}
-      <div className="dialog-actions"><button type="button" onClick={onClose}>关闭</button>{!readOnly && <button type="button" className="primary" disabled={!parsed.chart || Boolean(parsed.error)} onClick={() => parsed.chart && onSave(parsed.chart)}>应用数据</button>}</div>
+      {readOnly && <p className="bound-data-note"><Lock size={14} />该图表来自旧版集中字段或派生公式，这里按单元格只读显示；标签和位置仍可精修。</p>}
+      <CellGridEditor kind="chart" draft={draft} readOnly={readOnly} columnLimit={element.chartKind === "donut" ? 2 : MAX_GRID_COLUMNS} onChange={setDraft} />
+      {donutError && <p className="dialog-data-error">{donutError}</p>}
+      <div className="dialog-actions"><button type="button" onClick={onClose}>{readOnly ? "关闭" : "取消"}</button>{!readOnly && <button type="button" className="primary" disabled={!validation.valid || Boolean(donutError)} onClick={() => onSave(chartFromCellGrid(draft, element.chart!, element.chartKind))}>应用数据</button>}</div>
     </div>
   </div>;
 }
@@ -2222,16 +2658,15 @@ function TableDataDialog({ element, readOnly, onClose, onSave }: {
   onClose: () => void;
   onSave: (table: TableData) => void;
 }) {
-  const [value, setValue] = useState(() => tableToTsv(element));
-  const table = useMemo(() => tsvToTable(value), [value]);
-  const error = !value.trim() ? "请至少输入一行表头" : !table ? "表格必须包含表头，且每一行的列数一致" : "";
+  const [draft, setDraft] = useState(() => tableToCellGrid(element.table!));
+  const validation = useMemo(() => cellGridValidation("table", draft), [draft]);
+  const dialogRef = useDialogFocus(onClose);
   return <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
-    <div className="validation-dialog chart-data-dialog" role="dialog" aria-modal="true" aria-labelledby="table-data-title" onMouseDown={(event) => event.stopPropagation()}>
+    <div ref={dialogRef} className="validation-dialog chart-data-dialog" role="dialog" aria-modal="true" aria-labelledby="table-data-title" onMouseDown={(event) => event.stopPropagation()}>
       <div className="dialog-title"><div><h2 id="table-data-title">{readOnly ? "查看表格数据" : "编辑本表数据"}</h2><small>{element.name}</small></div><IconButton label="关闭" onClick={onClose}><X size={17} /></IconButton></div>
-      {readOnly && <p className="bound-data-note"><Lock size={14} />该表格使用集中字段绑定。请在“本地数据”中修改；这里仅查看。</p>}
-      <textarea className="chart-data-editor" value={value} readOnly={readOnly} spellCheck={false} onChange={(event) => setValue(event.target.value)} />
-      {!readOnly && <p className={error ? "dialog-validation error" : "dialog-validation ready"}>{error || `已识别 ${table?.headers.length || 0} 列、${table?.rows.length || 0} 行`}</p>}
-      <div className="dialog-actions"><button type="button" onClick={onClose}>关闭</button>{!readOnly && <button type="button" className="primary" disabled={!table || Boolean(error)} onClick={() => table && onSave(table)}>应用数据</button>}</div>
+      {readOnly && <p className="bound-data-note"><Lock size={14} />该表格来自旧版集中字段，这里按单元格只读显示。</p>}
+      <CellGridEditor kind="table" draft={draft} readOnly={readOnly} onChange={setDraft} />
+      <div className="dialog-actions"><button type="button" onClick={onClose}>{readOnly ? "关闭" : "取消"}</button>{!readOnly && <button type="button" className="primary" disabled={!validation.valid} onClick={() => onSave(tableFromCellGrid(draft))}>应用数据</button>}</div>
     </div>
   </div>;
 }
@@ -2481,6 +2916,10 @@ function EditorApp({ suppliedProject, embedded }: {
     if (!session) return documentRef.current;
     replaceTextEdit(null);
     if (mode === "cancel") return documentRef.current;
+    if (session.elementId && embeddedRef.current?.protectedElementIds.has(session.elementId)) {
+      notify("旧版绑定内容只能查看，已放弃未提交的事实修改");
+      return documentRef.current;
+    }
     const runsChanged = JSON.stringify(session.runs) !== JSON.stringify(session.originalRuns);
     if (session.value === session.originalValue && !runsChanged) return documentRef.current;
     const current = documentRef.current;
@@ -2755,7 +3194,11 @@ function EditorApp({ suppliedProject, embedded }: {
     if (compactLayout) setLeftOpen(false);
   };
 
-  const updateElement = (id: string, recipe: (element: ReportElement) => void, mergeField?: string) => {
+  const updateElement = (id: string, recipe: (element: ReportElement) => void, mergeField?: string, protectedField = mergeField) => {
+    if (embeddedRef.current?.protectedElementIds.has(id) && ["content", "chart", "table"].includes(protectedField || "")) {
+      notify("旧版绑定事实只能查看，请回到本地数据面板修改");
+      return;
+    }
     commit((draft) => {
       const page = draft.pages.find((item) => item.id === activePageId);
       const element = page?.elements.find((item) => item.id === id);
@@ -3465,6 +3908,10 @@ function EditorApp({ suppliedProject, embedded }: {
   };
 
   const requestPrint = () => {
+    if (chartDataElementId || tableDataElementId) {
+      notify("请先应用或取消单元格编辑，再打印或导出 PDF");
+      return;
+    }
     finishCropEdit("commit");
     const report = finishTextEdit("commit");
     const issues = validateDocument(report, fontWarnings);
@@ -3846,6 +4293,8 @@ function EditorApp({ suppliedProject, embedded }: {
                   }}
                   uploadImage={uploadImage}
                   setAsMaster={() => setImageAsMaster(selectedElement.id)}
+                  onEditChartData={() => setChartDataElementId(selectedElement.id)}
+                  onEditTableData={() => setTableDataElementId(selectedElement.id)}
                 /> : (
                   <InspectorEmpty count={selectedElements.length} icon={<Database size={24} />} title={selectedElements.length > 1 ? `已选择 ${selectedElements.length} 个元素` : "未选择元素"} />
                 )
@@ -3873,10 +4322,15 @@ function EditorApp({ suppliedProject, embedded }: {
 
       {toast && <div className="toast"><Check size={15} />{toast}</div>}
       {chartDataElement?.chart && <ChartDataDialog
+        key={chartDataElement.id}
         element={chartDataElement}
         readOnly={embedded?.protectedElementIds.has(chartDataElement.id) || false}
         onClose={() => setChartDataElementId(null)}
         onSave={(chart) => {
+          if (embedded?.protectedElementIds.has(chartDataElement.id)) {
+            notify("旧版绑定图表只能查看，不能在此改写事实数据");
+            return;
+          }
           if (chartDataElement.chartKind === "donut") {
             const values = chart.series[0]?.values || [];
             if (values.some((value) => value < 0) || !values.some((value) => value > 0)) {
@@ -3884,16 +4338,22 @@ function EditorApp({ suppliedProject, embedded }: {
               return;
             }
           }
-          updateElement(chartDataElement.id, (element) => { element.chart = chart; });
+          updateElement(chartDataElement.id, (element) => { element.chart = chart; pruneChartLabelOffsets(element, chart); }, undefined, "chart");
+          setSelectedChartLabel(null);
           setChartDataElementId(null);
         }}
       />}
       {tableDataElement?.table && <TableDataDialog
+        key={tableDataElement.id}
         element={tableDataElement}
         readOnly={embedded?.protectedElementIds.has(tableDataElement.id) || false}
         onClose={() => setTableDataElementId(null)}
         onSave={(table) => {
-          updateElement(tableDataElement.id, (element) => { element.table = table; });
+          if (embedded?.protectedElementIds.has(tableDataElement.id)) {
+            notify("旧版绑定表格只能查看，不能在此改写事实数据");
+            return;
+          }
+          updateElement(tableDataElement.id, (element) => { element.table = table; }, undefined, "table");
           setTableDataElementId(null);
         }}
       />}
@@ -3957,7 +4417,15 @@ function formatBytes(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
-function DataInspector({ element, readOnlyData = false, update, uploadImage, setAsMaster }: { element: ReportElement; readOnlyData?: boolean; update: (recipe: (element: ReportElement) => void, mergeField?: string) => void; uploadImage: (event: ChangeEvent<HTMLInputElement>) => void; setAsMaster: () => void }) {
+function DataInspector({ element, readOnlyData = false, update, uploadImage, setAsMaster, onEditChartData, onEditTableData }: {
+  element: ReportElement;
+  readOnlyData?: boolean;
+  update: (recipe: (element: ReportElement) => void, mergeField?: string) => void;
+  uploadImage: (event: ChangeEvent<HTMLInputElement>) => void;
+  setAsMaster: () => void;
+  onEditChartData: () => void;
+  onEditTableData: () => void;
+}) {
   const isChart = element.type === "chart";
   const isCombo = element.chartKind === "combo";
   return <>
@@ -3973,29 +4441,8 @@ function DataInspector({ element, readOnlyData = false, update, uploadImage, set
         {isChart && <Field label="图表类型" wide><select disabled={readOnlyData} value={element.chartKind || "line"} onChange={(event) => update((item) => { item.chartKind = event.target.value as NonNullable<ReportElement["chartKind"]>; }, "chart-kind")}><option value="line">折线图</option><option value="bar">柱状图</option><option value="combo">柱线组合图</option><option value="donut">环形图</option></select></Field>}
       </div>
     </Section>
-    {isChart && <Section title="粘贴数据" action={<span className="format-note">首列类目</span>}>
-      <textarea className="data-textarea" readOnly={readOnlyData} spellCheck={false} key={`${element.id}-${JSON.stringify(element.chart)}`} defaultValue={chartToTsv(element.chart)} onBlur={(event) => {
-        if (readOnlyData) return;
-        const parsed = parseChartTsv(event.target.value, element.chart);
-        if (parsed.error || !parsed.chart) {
-          window.alert(parsed.error || "图表数据无法识别");
-          event.target.value = chartToTsv(element.chart);
-          return;
-        }
-        const chart = parsed.chart;
-        update((item) => {
-          if (isCombo) {
-            const previous = item.chart?.series || [];
-            chart.series = chart.series.map((series, index) => ({
-              ...series,
-              kind: previous[index]?.kind || (index === chart.series.length - 1 ? "line" : "bar"),
-              axis: previous[index]?.axis || (index === chart.series.length - 1 ? "right" : "left"),
-              unit: previous[index]?.unit || ""
-            }));
-          }
-          item.chart = chart;
-        }, "chart");
-      }} />
+    {isChart && <Section title="本图数据" action={<span className="format-note">{element.chart?.categories.length || 0} 行 × {(element.chart?.series.length || 0) + 1} 列</span>}>
+      <div className="data-editor-summary"><div><strong>{element.chart?.series.map((series) => series.name).join("、") || "尚无系列"}</strong><span>每个图表独立保存自己的类目和系列</span></div><button type="button" onClick={onEditChartData}><Table2 size={14} />{readOnlyData ? "查看单元格" : "打开单元格编辑器"}</button></div>
       <div className="toggle-row">
         <label><input type="checkbox" checked={element.style.showLabel !== false} onChange={(event) => update((item) => { item.style.showLabel = event.target.checked; })} />数据标签</label>
         <label><input type="checkbox" checked={element.style.showLegend !== false} onChange={(event) => update((item) => { item.style.showLegend = event.target.checked; })} />图例</label>
@@ -4009,12 +4456,8 @@ function DataInspector({ element, readOnlyData = false, update, uploadImage, set
         </div>)}
       </div>}
     </Section>}
-    {element.type === "table" && <Section title="粘贴表格" action={<span className="format-note">首行为表头</span>}>
-      <textarea className="data-textarea table-data" readOnly={readOnlyData} spellCheck={false} value={tableToTsv(element)} onChange={(event) => {
-        if (readOnlyData) return;
-        const table = tsvToTable(event.target.value);
-        if (table) update((item) => { item.table = table; }, "table");
-      }} />
+    {element.type === "table" && <Section title="本表数据" action={<span className="format-note">{element.table?.rows.length || 0} 行 × {element.table?.headers.length || 0} 列</span>}>
+      <div className="data-editor-summary"><div><strong>{element.table?.headers.join("、") || "尚无表头"}</strong><span>本表数据只属于当前组件</span></div><button type="button" onClick={onEditTableData}><Table2 size={14} />{readOnlyData ? "查看单元格" : "打开单元格编辑器"}</button></div>
     </Section>}
     {element.type === "image" && <Section title="本地图片">
       <label className="upload-zone"><ImageIcon size={21} /><span>{element.assetId ? "更换图片" : "选择图片"}</span><input type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={uploadImage} /></label>

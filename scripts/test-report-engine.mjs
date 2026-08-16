@@ -77,6 +77,16 @@ test("editing one independent chart does not mutate any other chart", () => {
   assert.deepEqual(charts[1].chart, untouched);
 });
 
+test("direct charts reject duplicate category and series stable ids", () => {
+  const duplicate = copy(independentPackage);
+  const chart = packageElement(duplicate, "overview-chart").chart;
+  chart.categoryIds[1] = chart.categoryIds[0];
+  chart.series[1].id = chart.series[0].id;
+  const resultCodes = codes(compileWithoutThrow(duplicate, {}));
+  assert.ok(resultCodes.includes("chart-category-id-duplicate"));
+  assert.ok(resultCodes.includes("chart-series-id-duplicate"));
+});
+
 test("report packages require a stable document timestamp", () => {
   const missing = copy(reportPackage);
   delete missing.documentUpdatedAt;

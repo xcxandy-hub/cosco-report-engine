@@ -16,6 +16,7 @@
     "test:assets": "node --test scripts/test-asset-store.mjs",
     "test:overrides": "node scripts/test-visual-overrides.mjs",
     "test:dynamic-pages": "node scripts/test-dynamic-pages.mjs",
+    "test:cell-grid": "node scripts/test-cell-grid.mjs",
     "test:pdf-determinism": "node scripts/test-pdf-determinism.mjs",
     "engine:validate": "node scripts/report-engine-cli.mjs --trusted-code validate report-packages/finance-brief/report-package.mjs report-packages/finance-brief/redacted-data.json",
     "engine:compile": "node scripts/report-engine-cli.mjs --trusted-code compile report-packages/finance-brief/report-package.mjs report-packages/finance-brief/redacted-data.json artifacts/finance-brief/document.json",
@@ -23,7 +24,7 @@
     "engine:pdf": "node scripts/print-pdf.mjs artifacts/finance-brief/finance-brief-generator.html artifacts/finance-brief/finance-brief.pdf",
     "engine:inspect-pdf": "node scripts/run-inspect-pdf.mjs artifacts/finance-brief/finance-brief.pdf artifacts/finance-brief/rendered --expected-document artifacts/finance-brief/document.json",
     "check:engine-html": "node scripts/check-offline.mjs artifacts/finance-brief/finance-brief-generator.html --require-csp",
-    "verify:release": "npm run typecheck && npm run test:migration && npm run test:engine && npm run test:assets && npm run test:overrides && npm run engine:validate && npm run engine:compile && npm run engine:build && npm run test:dynamic-pages && npm run check:offline && npm run check:engine-html && npm run qa:visual && npm run engine:pdf && npm run test:pdf-determinism && npm run engine:inspect-pdf && npm run check:contract"
+    "verify:release": "npm run typecheck && npm run test:migration && npm run test:engine && npm run test:assets && npm run test:overrides && npm run engine:validate && npm run engine:compile && npm run engine:build && npm run test:cell-grid && npm run test:dynamic-pages && npm run check:offline && npm run check:engine-html && npm run qa:visual && npm run engine:pdf && npm run test:pdf-determinism && npm run engine:inspect-pdf && npm run check:contract"
   },
   "dependencies": {
     "echarts": "6.1.0",

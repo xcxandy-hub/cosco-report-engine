@@ -406,6 +406,8 @@ function validateDirectChart(chart: unknown, path: string, locator?: string): En
   }
   if (candidate.categoryIds !== undefined && (!Array.isArray(candidate.categoryIds) || candidate.categoryIds.length !== candidate.categories?.length || candidate.categoryIds.some((item) => typeof item !== "string" || !item))) {
     issues.push({ severity: "error", code: "chart-category-ids", path, locator, message: "图表稳定类目 ID 必须与类目等长且非空" });
+  } else if (Array.isArray(candidate.categoryIds) && new Set(candidate.categoryIds).size !== candidate.categoryIds.length) {
+    issues.push({ severity: "error", code: "chart-category-id-duplicate", path, locator, message: "同一图表的稳定类目 ID 不得重复" });
   }
   if (!Array.isArray(candidate.series) || !candidate.series.length) {
     issues.push({ severity: "error", code: "chart-series", path, locator, message: "图表至少需要一个有效序列" });
@@ -424,6 +426,8 @@ function validateDirectChart(chart: unknown, path: string, locator?: string): En
     if (series.unit !== undefined && typeof series.unit !== "string") issues.push({ severity: "error", code: "chart-series-unit", path: seriesPath, locator, message: "图表序列 unit 必须是字符串" });
     if (series.id !== undefined && (typeof series.id !== "string" || !series.id)) issues.push({ severity: "error", code: "chart-series-id", path: seriesPath, locator, message: "图表序列稳定 ID 必须是非空字符串" });
   });
+  const suppliedSeriesIds = candidate.series.map((series) => series?.id).filter((id): id is string => typeof id === "string" && Boolean(id));
+  if (new Set(suppliedSeriesIds).size !== suppliedSeriesIds.length) issues.push({ severity: "error", code: "chart-series-id-duplicate", path, locator, message: "同一图表的序列稳定 ID 不得重复" });
   return issues;
 }
 
@@ -444,12 +448,19 @@ function withStableChartIds(chart: ChartData): ChartData {
     });
   }
   const seriesCounts = new Map<string, number>();
+  const usedSeriesIds = new Set(next.series.map((series) => series.id).filter((id): id is string => Boolean(id)));
   next.series.forEach((series, index) => {
     if (series.id) return;
     const base = stableChartKey(series.name, `series-${index + 1}`);
-    const occurrence = (seriesCounts.get(base) || 0) + 1;
+    let occurrence = (seriesCounts.get(base) || 0) + 1;
+    let candidate = occurrence === 1 ? base : `${base}-${occurrence}`;
+    while (usedSeriesIds.has(candidate)) {
+      occurrence += 1;
+      candidate = `${base}-${occurrence}`;
+    }
     seriesCounts.set(base, occurrence);
-    series.id = occurrence === 1 ? base : `${base}-${occurrence}`;
+    usedSeriesIds.add(candidate);
+    series.id = candidate;
   });
   return next;
 }
