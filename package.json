@@ -1,22 +1,25 @@
 {
   "name": "local-report-studio",
   "private": true,
-  "version": "1.7.0",
+  "version": "1.8.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "typecheck": "tsc -b --pretty false",
     "preview": "vite preview",
-    "check:offline": "node scripts/check-offline.mjs",
+    "check:offline": "node scripts/check-offline.mjs dist/index.html --require-csp",
     "check:contract": "node scripts/check-contract.mjs",
     "qa:visual": "node scripts/visual-qa.mjs",
+    "qa:templates": "node scripts/template-visual-qa.mjs",
     "test:migration": "node scripts/test-migration.mjs",
     "test:engine": "node --test scripts/test-report-engine.mjs",
     "test:assets": "node --test scripts/test-asset-store.mjs",
     "test:overrides": "node scripts/test-visual-overrides.mjs",
     "test:dynamic-pages": "node scripts/test-dynamic-pages.mjs",
     "test:cell-grid": "node scripts/test-cell-grid.mjs",
+    "test:templates": "node scripts/test-page-templates.mjs",
+    "check:brand-assets": "node scripts/generate-brand-assets.mjs --verify",
     "test:pdf-determinism": "node scripts/test-pdf-determinism.mjs",
     "engine:validate": "node scripts/report-engine-cli.mjs --trusted-code validate report-packages/finance-brief/report-package.mjs report-packages/finance-brief/redacted-data.json",
     "engine:compile": "node scripts/report-engine-cli.mjs --trusted-code compile report-packages/finance-brief/report-package.mjs report-packages/finance-brief/redacted-data.json artifacts/finance-brief/document.json",
@@ -24,7 +27,7 @@
     "engine:pdf": "node scripts/print-pdf.mjs artifacts/finance-brief/finance-brief-generator.html artifacts/finance-brief/finance-brief.pdf",
     "engine:inspect-pdf": "node scripts/run-inspect-pdf.mjs artifacts/finance-brief/finance-brief.pdf artifacts/finance-brief/rendered --expected-document artifacts/finance-brief/document.json",
     "check:engine-html": "node scripts/check-offline.mjs artifacts/finance-brief/finance-brief-generator.html --require-csp",
-    "verify:release": "npm run typecheck && npm run test:migration && npm run test:engine && npm run test:assets && npm run test:overrides && npm run engine:validate && npm run engine:compile && npm run engine:build && npm run test:cell-grid && npm run test:dynamic-pages && npm run check:offline && npm run check:engine-html && npm run qa:visual && npm run engine:pdf && npm run test:pdf-determinism && npm run engine:inspect-pdf && npm run check:contract"
+    "verify:release": "npm run typecheck && npm run test:migration && npm run test:engine && npm run test:assets && npm run test:overrides && npm run test:templates && npm run check:brand-assets && npm run engine:validate && npm run engine:compile && npm run engine:build && npm run test:cell-grid && npm run test:dynamic-pages && npm run check:offline && npm run check:engine-html && npm run qa:visual && npm run qa:templates && npm run engine:pdf && npm run test:pdf-determinism && npm run engine:inspect-pdf && npm run check:contract"
   },
   "dependencies": {
     "echarts": "6.1.0",
@@ -38,6 +41,7 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.4",
     "pngjs": "7.0.0",
+    "sharp": "0.34.4",
     "typescript": "6.0.2",
     "vite": "8.2.1",
     "vite-plugin-singlefile": "2.3.3"

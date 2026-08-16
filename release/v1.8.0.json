@@ -1,0 +1,76 @@
+{
+  "product": "Local Report Studio",
+  "applicationVersion": "1.8.0",
+  "documentSchemaVersion": "1.5",
+  "reportEngineVersion": "0.1",
+  "releaseDate": "2026-08-16",
+  "status": "release-candidate",
+  "entry": "dist/index.html",
+  "byteSize": 5613918,
+  "sha256": "ae1517d058707efc61e69e3d93af9706f17b2b065f48f47374cb41ad7940346c",
+  "referenceGenerator": {
+    "entry": "artifacts/finance-brief/finance-brief-generator.html",
+    "authoringMode": "independent",
+    "byteSize": 6622045,
+    "sha256": "2fd651aa6105c7d3f8df118052e48ee3f566882c74f67352e0f8fb29bb7e47ab"
+  },
+  "referencePdf": {
+    "entry": "artifacts/finance-brief/finance-brief.pdf",
+    "pageCountSource": "artifacts/finance-brief/document.json",
+    "pageCountScope": "finance-brief-reference-only",
+    "note": "PDF 验收页数从本次编译文档的 pages.length 读取；finance-brief 当前页数不是报告内核上限。",
+    "byteSize": 3710473,
+    "sha256": "b4b81fb989f0012296f6c2af1564efbf56111343506e147f4c03c41302d48a18"
+  },
+  "engineLimits": {
+    "maximumPages": null,
+    "pageCountPolicy": "报告包至少一页，不设置固定最大页数；实际容量受浏览器内存、图片体积与打印环境约束。"
+  },
+  "authoringModes": {
+    "default": "independent",
+    "newReports": "independent",
+    "legacyCompatibility": "bound",
+    "legacyMissingMode": "bound"
+  },
+  "templateLibrary": {
+    "coverTemplates": 5,
+    "chromeTemplates": 3,
+    "orientations": ["portrait", "landscape"],
+    "output": "atomic-elements"
+  },
+  "brandAssets": {
+    "transparentPngLogos": 3,
+    "localCoverImages": 5,
+    "runtimeNetwork": false
+  },
+  "featureBaseline": "docs/feature-baseline-v1.8.0.md",
+  "contract": "docs/contracts-v1.8.0.md",
+  "research": [
+    "docs/github-skill-research.md",
+    "docs/online-editor-research-v1.4.md",
+    "docs/institutional-report-design-study-v1.4.md",
+    "docs/institutional-layout-study-v1.8.0.md"
+  ],
+  "requiredChecks": [
+    "typecheck",
+    "test:migration",
+    "test:engine",
+    "test:assets",
+    "test:overrides",
+    "test:templates",
+    "check:brand-assets",
+    "engine:validate",
+    "engine:compile",
+    "engine:build",
+    "test:cell-grid",
+    "test:dynamic-pages",
+    "check:offline",
+    "check:engine-html",
+    "qa:visual",
+    "qa:templates",
+    "engine:pdf",
+    "test:pdf-determinism",
+    "engine:inspect-pdf",
+    "check:contract"
+  ]
+}

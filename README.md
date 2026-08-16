@@ -1,8 +1,8 @@
 # 通用本地 PDF 报告生成器
 
-这是一个面向经营分析、财务简报、专题研究和管理层汇报的本地报告工作台。编辑器负责毫米级页面、人工微调与 A4 打印；报告内核把智能体制作的特化报告包编译到同一个渲染器。当前发布候选应用版本为 `1.7.0`，工程格式为 `ReportDocument 1.5`。版本边界见 [v1.7.0 特性基线](./docs/feature-baseline-v1.7.0.md) 和 [v1.7.0 契约](./docs/contracts-v1.7.0.md)。
+这是一个面向经营分析、财务简报、专题研究和管理层汇报的本地报告工作台。编辑器负责毫米级页面、人工微调与 A4 打印；报告内核把智能体制作的特化报告包编译到同一个渲染器。当前发布候选应用版本为 `1.8.0`，工程格式为 `ReportDocument 1.5`。版本边界见 [v1.8.0 特性基线](./docs/feature-baseline-v1.8.0.md) 和 [v1.8.0 契约](./docs/contracts-v1.8.0.md)。
 
-本仓库是社区项目，不是中远海运集团或其下属公司的官方软件、品牌手册或数据产品。默认主题只是可替换的本地企业报告起点，公开样例使用合成数据且不包含官方 Logo。
+本仓库是社区项目，不是中远海运集团或其下属公司的官方软件、品牌手册或数据产品。默认主题只是可替换的本地企业报告起点，公开样例使用合成数据。内置彩色和白色 Logo 位图从用户提供的旧版工具原始路径提取，相关名称与商标归其权利人；这些商标资产明确排除于仓库 MIT 许可之外，使用者需自行确认使用与再分发权限。“中远海运 / COSCO SHIPPING REPORTS”横向组合是本项目的报告工作台组合标识，不是正式品牌规范资产。封面起始照片来自 Wikimedia Commons 的公有领域或 CC0 素材，逐项来源见 [素材说明](./src/assets/brand/covers/NOTICE.md)。
 
 ## GitHub 安装与智能体调用
 
@@ -46,7 +46,7 @@ python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-installer/scripts/inst
 推荐工作流：
 
 1. 从“经营分析”“财务简报”“研究出版”或“空白报告”新建工程。
-2. 在左侧切换页面。组件库分为“基础元素”和“组合模块”：KPI、重点结论、带标题图表/表格只是快速入口，插入后实际由文本、色块、图表和表格等基础元素组成。
+2. 在左侧切换“页面 / 组件 / 模板”。组件库分为“基础元素”和“组合模块”；模板库提供 5 套封面和 3 套页眉页脚，每套都按当前横版或竖版生成独立几何。KPI、重点结论和模板都只是快速入口，插入后仍由文字、色块、分隔线、图片、图表和表格等普通元素组成。
 3. 在画布中拖动、框选、多选和八向缩放。默认吸附 5 mm 网格、页边距、画布中心及其他元素；工具栏支持相对页面或选区的六向精确对齐和等间距分布。
 4. 双击任一文本或表格单元格可在页面内直接修改。组合默认整体选择、移动、复制、锁定和隐藏；点击“拆分组合”后可逐元素重排。多行内容使用原生 `textarea`，单行字段使用原生 `input`。
 5. 选中图表或表格后，点击组件旁的“编辑数据”，只修改当前对象；图表还可在同一浮动工具条调整标签疏密和单点位置。右侧面板用于样式、图层、图片、页面和报告级高级设置。
@@ -67,6 +67,8 @@ python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-installer/scripts/inst
 | 组合 | KPI、重点结论、带标题图表/表格和图片说明；整体选择、移动、复制、删除、锁定、隐藏和拆组，复制时更新 group ID |
 | 数据 | 每个图表/表格直接持有自己的数据；组件旁单元格编辑；Excel 连续区域从当前格粘贴并按需扩展；可增删行列；ECharts SVG；组合图逐系列柱/线与左右轴；系列/类目稳定 ID；五种标签模式；纵横版独立毫米偏移 |
 | 页面 | 封面、章节、标准、数据、空白、尾页；所有页面类型支持背景图、焦点、主题叠色与双向转换；新建纵横版页面、空页面换向、复制与删除 |
+| 模板 | 5 套封面设计与 3 套页眉页脚设计；每套分别定义纵横坐标；图片、蒙版、Logo、标题、规则线、章节名、密级和页码全部生成普通元素，可继续替换、拖动、缩放、改字、改色和撤销；页面增删或报告设置变化后制度槽位自动同步 |
+| 品牌 | 内置透明彩色 Logo、透明白色 Logo 和报告工作台横向组合；5 张本地可再分发航运起始图；模板应用与报告运行均不联网 |
 | 制度元素 | 页眉、页脚、页码、顶部/底部规则线与尾页制度文字均为普通元素，可选择、移动、缩放、对齐、锁定、显隐和排序 |
 | 图片 | 内容图与页面母版图均可直接非破坏裁切、自由/固定比例取景、纯色/渐变/duotone 叠色、混合模式、调色预设、暗角、编辑与打印同构 |
 | 资产 | 导入矫正方向并剥离 EXIF/GPS，最长边默认 4096 px，照片 JPEG q0.85，SHA-256 去重；本地仓仅接受经 MIME、规范 base64 与文件签名复核的 PNG/JPEG/WebP，旧 IndexedDB 记录读取时重新校验；工程导入最多 256 张、单图 64 MP、合计 256 MP，并在完整解码前预读尺寸头 |
@@ -132,6 +134,8 @@ npm run test:migration
 npm run test:engine
 npm run test:assets
 npm run test:overrides
+npm run test:templates
+npm run check:brand-assets
 npm run engine:validate
 npm run engine:compile
 npm run engine:build
@@ -144,16 +148,17 @@ npm run check:offline
 npm run check:engine-html
 npm run check:contract
 npm run qa:visual
+npm run qa:templates
 npm run verify:release
 ```
 
 `npm run build` 使用 `vite-plugin-singlefile` 将 React、ECharts、Lucide 和全部 CSS 内联到 `dist/index.html`。`npm run check:offline` 会扫描最终 HTML 的资源属性、CSS `url()` 以及源码中的 HTTP/HTTPS 字符串，发现外部运行时资源即失败。
 
-`npm run qa:visual` 会用无头 Chromium 生成混合纵横版 PDF、逐页 PNG 与 `artifacts/visual-qa/contact-sheet.png`。每次有意义的版式改动后都应运行，并按打印检查清单逐页目检。
+`npm run qa:visual` 会用无头 Chromium 生成混合纵横版 PDF、逐页 PNG 与 `artifacts/visual-qa/contact-sheet.png`。`npm run qa:templates` 进一步把 5 套封面和 3 套页眉页脚的全部横竖版组合打印为 16 页 PDF，逐页核对 A4 方向、可搜索文字与异常空白，并固化 `artifacts/template-visual-qa/contact-sheet.png` 总览。每次有意义的版式改动后都应运行，并按打印检查清单逐页目检。
 
 PDF 检查需要 `pdfplumber`、Pillow 和 Poppler。`engine:inspect-pdf` 会依次探测 `CODEX_PYTHON`、Codex 工作区自带 Python 和系统 `python3`，自动选择具备依赖的环境；普通环境可先执行 `python3 -m pip install pdfplumber pillow`，并确保可调用 `pdftoppm`。
 
-`npm run test:migration` 会验证 1.0-1.5 导入、原子化迁移、稳定图表 ID、图片和主题注入。`npm run test:engine` 覆盖派生覆盖、未知绑定、畸形包、报告包图片签名、主题注入、重复事实和脱敏边界。`npm run test:assets` 验证本地 PNG/JPEG/WebP 的 MIME、签名、规范 base64、零 `fetch`、IndexedDB 重校验与报告包命名空间；`npm run test:overrides` 验证数据刷新后的稳定 ID 重放、事实字段/删除/复制三重保护、纵横版标签偏移隔离和孤儿覆盖提示。`npm run test:cell-grid` 在真实 Chrome 中验证逐格编辑、增删行列、Excel 连续区域粘贴、非法值、取消、两次应用两次撤销、图表隔离、稳定 ID 重排、表格草稿和 390 px 内部滚动。`npm run engine:compile` 生成本轮 `artifacts/finance-brief/document.json`，`engine:inspect-pdf` 从其中读取页数和逐页方向，不硬编码十页，并逐页验证 A4。`npm run test:pdf-determinism` 会连续打印两次同一特化 HTML 并要求字节完全一致。`npm run check:contract` 会核对应用版本、文档 schema、内核契约和固化产物 SHA-256。`npm run verify:release` 顺序执行完整仓库门禁，实际 PDF 由 `engine:pdf`、可复现性测试和 `engine:inspect-pdf` 联合验收。
+`npm run test:migration` 会验证 1.0-1.5 导入、原子化迁移、稳定图表 ID、图片和主题注入。`npm run test:engine` 覆盖派生覆盖、未知绑定、畸形包、报告包图片签名、主题注入、重复事实和脱敏边界。`npm run test:assets` 验证本地 PNG/JPEG/WebP 的 MIME、签名、规范 base64、零 `fetch`、IndexedDB 重校验与报告包命名空间；`npm run test:overrides` 验证数据刷新后的稳定 ID 重放、事实字段/删除/复制三重保护、纵横版标签偏移隔离和孤儿覆盖提示。`npm run test:templates` 验证 5 套封面与 3 套页眉页脚在横竖版中的边界、原子性、可编辑性、母版图片/裁切保留、实际资产安装、密级规则和页码；`npm run check:brand-assets` 验证 Logo 的 PNG 签名、RGBA、透明四角以及全部起始图签名、尺寸、字节数与固化哈希。`npm run test:cell-grid` 在真实 Chrome 中验证逐格编辑、增删行列、Excel 连续区域粘贴、非法值、取消、两次应用两次撤销、图表隔离、稳定 ID 重排、表格草稿和 390 px 内部滚动。`npm run engine:compile` 生成本轮 `artifacts/finance-brief/document.json`，`engine:inspect-pdf` 从其中读取页数和逐页方向，不硬编码十页，并逐页验证 A4。`npm run test:pdf-determinism` 会连续打印两次同一特化 HTML 并要求字节完全一致。`npm run check:contract` 会核对应用版本、文档 schema、隐私/CSP、模板视觉矩阵和固化产物 SHA-256。`npm run verify:release` 顺序执行完整仓库门禁，实际 PDF 由模板矩阵、`engine:pdf`、可复现性测试和 `engine:inspect-pdf` 联合验收。
 
 仓库内的 `scripts/print-pdf.mjs` 使用本机 Chrome DevTools Protocol 的 `preferCSSPageSize` 生成混合纵横版样例，便于在没有打印对话框的环境中复验 CSS 页面尺寸：
 
@@ -180,9 +185,10 @@ node scripts/print-pdf.mjs dist/index.html artifacts/report.pdf
 
 ## 设计与研究
 
-- [v1.7.0 特性基线](./docs/feature-baseline-v1.7.0.md)
-- [v1.7.0 规范契约](./docs/contracts-v1.7.0.md)
-- [v1.7.0 发布清单](./release/v1.7.0.json)
+- [v1.8.0 特性基线](./docs/feature-baseline-v1.8.0.md)
+- [v1.8.0 规范契约](./docs/contracts-v1.8.0.md)
+- [v1.8.0 发布清单](./release/v1.8.0.json)
+- [头部机构版式研究 v1.8](./docs/institutional-layout-study-v1.8.0.md)
 - [报告内核架构](./docs/report-engine-architecture.md)
 - [GitHub Skill 与 PDF 工程调研](./docs/github-skill-research.md)
 - [旧财务简报行为承接矩阵](./docs/legacy-finance-parity-v1.5.0.md)

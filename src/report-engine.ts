@@ -999,6 +999,7 @@ function stableDecoration(page: EnginePageDefinition, role: NonNullable<ReportEl
 }
 
 function pageDecorations(reportPackage: ReportPackageDefinition, page: EnginePageDefinition, meta: ReportDocument["meta"], pageNumber: number, totalPages: number): ReportElement[] {
+  if (page.elements.some((element) => element.presetId?.startsWith("chrome-template:"))) return [];
   const size = PAGE_SIZE[page.orientation];
   const margin = reportPackage.pageSetup?.margin ?? 18;
   const innerWidth = size.width - margin * 2;

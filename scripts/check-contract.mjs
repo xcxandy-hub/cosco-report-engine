@@ -39,18 +39,24 @@ const [
   assetStore,
   assetStoreTest,
   reportEngineArchitecture,
-  skillLearnings
+  skillLearnings,
+  pageTemplates,
+  brandAssets,
+  templateTest,
+  brandScript,
+  layoutStudy,
+  coverNotice
 ] = await Promise.all([
   read("VERSION"),
   read("package.json"),
-  read("release/v1.7.0.json"),
+  read("release/v1.8.0.json"),
   read("src/model.ts"),
   read("src/templates.ts"),
   read("src/App.tsx"),
   read("README.md"),
   read("docs/architecture.md"),
-  read("docs/feature-baseline-v1.7.0.md"),
-  read("docs/contracts-v1.7.0.md"),
+  read("docs/feature-baseline-v1.8.0.md"),
+  read("docs/contracts-v1.8.0.md"),
   read("docs/online-editor-research-v1.4.md"),
   read("docs/institutional-report-design-study-v1.4.md"),
   read("src/report-engine.ts"),
@@ -71,7 +77,37 @@ const [
   read("src/asset-store.ts"),
   read("scripts/test-asset-store.mjs"),
   read("docs/report-engine-architecture.md"),
-  read("docs/skill-learnings.md")
+  read("docs/skill-learnings.md"),
+  read("src/page-templates.ts"),
+  read("src/brand-assets.ts"),
+  read("scripts/test-page-templates.mjs"),
+  read("scripts/generate-brand-assets.mjs"),
+  read("docs/institutional-layout-study-v1.8.0.md"),
+  read("src/assets/brand/covers/NOTICE.md")
+]);
+
+const [
+  mainSkill,
+  modifyReportPrompt,
+  modifyCorePrompt,
+  thirdPartyNotices,
+  securityPolicy,
+  licenseText,
+  offlineCheck,
+  viteConfig,
+  templateVisualQa,
+  templateVisualInspectionText
+] = await Promise.all([
+  read(".agents/skills/cosco-report/SKILL.md"),
+  read(".agents/skills/cosco-report/references/prompt-modify-specialized-report.md"),
+  read(".agents/skills/cosco-report/references/prompt-modify-core-engine.md"),
+  read("docs/third-party-methodology-notices.md"),
+  read("SECURITY.md"),
+  read("LICENSE"),
+  read("scripts/check-offline.mjs"),
+  read("vite.config.ts"),
+  read("scripts/template-visual-qa.mjs"),
+  read("artifacts/template-visual-qa/inspection.json")
 ]);
 
 const version = versionText.trim();
@@ -79,8 +115,9 @@ const packageJson = JSON.parse(packageText);
 const manifest = JSON.parse(manifestText);
 const financePackageObject = JSON.parse(financePackage);
 const financeElements = financePackageObject.pages.flatMap((page) => page.elements);
+const templateVisualInspection = JSON.parse(templateVisualInspectionText);
 
-requireCondition(version === "1.7.0", `VERSION 应为 1.7.0，实际为 ${version}`);
+requireCondition(version === "1.8.0", `VERSION 应为 1.8.0，实际为 ${version}`);
 requireCondition(packageJson.version === version, "package.json.version 与 VERSION 不一致");
 requireCondition(manifest.applicationVersion === version, "发布清单应用版本与 VERSION 不一致");
 requireCondition(manifest.documentSchemaVersion === "1.5", "发布清单 schema 应为 1.5");
@@ -96,7 +133,7 @@ for (const type of ["text", "box", "divider", "image", "chart", "table"]) {
   requireCondition(elementType.includes(`"${type}"`), `基础元素联合类型缺少 ${type}`);
 }
 for (const legacyType of ["title", "kpi", "quote", "source", "line-chart", "bar-chart", "combo-chart", "donut-chart"]) {
-  requireCondition(!elementType.includes(`"${legacyType}"`), `1.7 基础元素联合类型仍包含旧类型 ${legacyType}`);
+  requireCondition(!elementType.includes(`"${legacyType}"`), `1.8 基础元素联合类型仍包含旧类型 ${legacyType}`);
 }
 requireCondition(model.includes("export type SemanticRole") && model.includes('semanticRole?: SemanticRole'), "文本语义角色模型缺失");
 requireCondition(model.includes("groupId?: string") && model.includes("presetSlot?: string"), "组合元数据缺失");
@@ -118,9 +155,9 @@ requireCondition(app.includes('<Section title="页面背景图"'), "页面背景
 const forbiddenEditorApis = ["contentEditable", "contenteditable", "execCommand", "getSelection"];
 for (const api of forbiddenEditorApis) requireCondition(!app.includes(api), `src/App.tsx 出现禁用编辑 API：${api}`);
 
-requireCondition(readme.includes("ReportDocument 1.5") && readme.includes("1.7.0"), "README 没有声明当前 v1.7.0 / schema 1.5");
+requireCondition(readme.includes("ReportDocument 1.5") && readme.includes("1.8.0") && readme.includes("5 套封面") && readme.includes("3 套页眉页脚"), "README 没有声明当前 v1.8.0、schema 或模板库");
 requireCondition(/\["ReportDocument 1\.5"\]/.test(architecture), "架构数据流没有声明 ReportDocument 1.5");
-requireCondition(featureBaseline.includes("应用版本：`1.7.0`") && featureBaseline.includes("完整 `ReportDocument`") && featureBaseline.includes("旧 `bound` 模式只保留为既有报告包兼容能力"), "特性基线没有固化 v1.7 独立模板或 bound 兼容边界");
+requireCondition(featureBaseline.includes("应用版本：`1.8.0`") && featureBaseline.includes("共 5 套") && featureBaseline.includes("共 3 套") && featureBaseline.includes("v1.7.0 的 independent"), "特性基线没有固化 v1.8 模板或 v1.7 兼容边界");
 requireCondition(contract.includes("工程格式：`ReportDocument 1.5`"), "契约文档 schema 不正确");
 requireCondition(contract.includes('authoringMode: "independent" | "bound"') && contract.includes("不建立跨组件引用、派生或勾稽"), "契约没有明确 independent/bound 模式或组件独立边界");
 requireCondition(contract.includes("选中图表或表格后") && contract.includes("保存只修改当前元素") && contract.includes("不设置固定最大页数"), "契约没有固化组件旁编辑、隔离保存或动态页数");
@@ -129,6 +166,27 @@ for (const vendor of ["Canva", "Adobe Express", "Piktochart", "Visme"]) requireC
 for (const sample of ["25e0a7ad-3af6-4869-83c9-3841cc15f094.pdf", "JPMorganOutlook2026PromiseandPressure.pdf", "ceo28-survey-transport-logistics-industry.pdf", "gr-shipping-trends-survey-report-noexp.pdf", "mi-guide-to-the-markets-us.pdf", "rmt2025_en.pdf", "transportation-logistics-services-sector-update.pdf"]) {
   requireCondition(reportStudy.includes(sample), `研报逐项学习缺少 ${sample}`);
 }
+for (const institution of ["Maersk Annual Report 2025", "Goldman Sachs Annual Report 2025", "COSCO SHIPPING International Annual Report 2024", "McKinsey Technology Trends Outlook 2025"]) requireCondition(layoutStudy.includes(institution), `v1.8 机构版式研究缺少 ${institution}`);
+
+for (const id of ["cinematic-fullbleed", "editorial-monogram", "institutional-rail", "split-image-panel", "publication-window"]) requireCondition(pageTemplates.includes(`\"${id}\"`), `封面模板缺少 ${id}`);
+for (const id of ["minimal-rule", "brand-rail", "editorial-corner"]) requireCondition(pageTemplates.includes(`\"${id}\"`), `页眉页脚模板缺少 ${id}`);
+requireCondition(pageTemplates.includes("page.elements.filter((item) => !isPageChrome(item))") && pageTemplates.includes("page.orientation"), "模板没有保护正文或按页面方向生成");
+requireCondition(pageTemplates.includes("coverTemplateRequiredAssetIds") && pageTemplates.includes("page.masterProps?.imageAssetId") && pageTemplates.includes("footerMode === \"confidentiality-last\"") && pageTemplates.includes("syncPageDecorationElements"), "模板没有保留母版图片、限制实际资产或同步制度元素");
+requireCondition(app.includes('type LeftTab = "pages" | "components" | "templates"') && app.includes("applyCoverLayout") && app.includes("applyChromeLayout"), "编辑器缺少模板栏或应用动作");
+requireCondition(templateTest.includes('for (const orientation of ["portrait", "landscape"])') && templateTest.includes("模板元素不可直接编辑") && templateTest.includes("删除了正文") && templateTest.includes("误把 Logo 当成封面图") && templateTest.includes("未遵守密级仅末页") && templateTest.includes("安装了未使用的模板预览图或 Logo") && templateTest.includes("删除末页后新末页没有恢复密级") && templateTest.includes("章节变化后模板页眉没有同步"), "模板测试没有覆盖横竖版、可编辑性、正文保护、母版图片、资产最小化或制度元素生命周期");
+requireCondition(brandAssets.includes("?inline") && brandAssets.includes("logoColor") && brandAssets.includes("logoWhite") && brandAssets.includes("logoLockup"), "内置品牌资源或单文件内联缺失");
+requireCondition(brandScript.includes("metadata.hasAlpha") && brandScript.includes("cornerAlpha") && brandScript.includes("EXPECTED") && brandScript.includes("与固化尺寸、字节数或 SHA-256 不一致"), "品牌资源脚本没有验证透明 PNG 或固化尺寸、字节数和哈希");
+requireCondition(coverNotice.includes("Public domain") && coverNotice.includes("CC0 1.0") && coverNotice.includes("Wikimedia Commons"), "封面起始图缺少可再分发来源说明");
+requireCondition(packageJson.scripts["qa:templates"] === "node scripts/template-visual-qa.mjs" && packageJson.scripts["verify:release"].includes("qa:templates") && manifest.requiredChecks?.includes("qa:templates"), "发布门禁没有包含全模板视觉矩阵");
+requireCondition(templateVisualQa.includes("COVER_TEMPLATES") && templateVisualQa.includes("CHROME_TEMPLATES") && templateVisualQa.includes("template-matrix.pdf") && templateVisualQa.includes("--expected-document"), "模板视觉矩阵没有覆盖全部模板或真实 PDF 逐页检查");
+requireCondition(templateVisualInspection.pages === 16 && !templateVisualInspection.errors?.length && !templateVisualInspection.warnings?.length && templateVisualInspection.pageSizes?.every((page) => page.a4Matched && page.expectedOrientation === page.actualOrientation), "模板视觉矩阵检查结果不是 16 页零错误零警告的横竖 A4");
+
+requireCondition(packageJson.scripts["check:offline"].includes("--require-csp") && viteConfig.includes("offline-content-security-policy") && viteConfig.includes("connect-src 'none'") && viteConfig.includes("modulePreload: { polyfill: false }"), "通用构建缺少严格 CSP 或仍注入 fetch 模块预加载代码");
+for (const api of ["fetch", "XMLHttpRequest", "WebSocket", "sendBeacon", "EventSource"]) requireCondition(offlineCheck.includes(api), `离线检查没有拒绝运行时网络 API：${api}`);
+requireCondition(mainSkill.includes("16 页全模板真实打印矩阵") && mainSkill.includes("connect-src 'none'") && securityPolicy.includes("local-first"), "Skill 或安全文档没有固化模板矩阵与本地隐私边界");
+requireCondition(createReportPrompt.includes("图表序列必须给有限数值") && createReportPrompt.includes("文字和表格文本可用星号"), "新建提示词的脱敏占位与图表数值验证器冲突");
+requireCondition(modifyReportPrompt.includes("先读取并锁定现有 `authoringMode`") && modifyReportPrompt.includes("不得在修改中偷换模式") && modifyReportPrompt.includes("fields / derived / rules / bindings"), "修改特化报告提示词没有区分 independent 与 bound");
+requireCondition(modifyCorePrompt.includes("内核") && thirdPartyNotices.includes("排除于 MIT 许可范围") && licenseText.includes("They are not") && licenseText.includes("licensed under the MIT License"), "核心修改提示词、第三方说明或商标资产许可证边界缺失");
 
 requireCondition(reportEngine.includes('REPORT_ENGINE_VERSION = "0.1"'), "报告内核版本缺失");
 requireCondition(reportEngine.includes("function validateBindingTemplate") && reportEngine.includes("function selectDeclaredData"), "报告内核绑定或声明字段边界缺失");
@@ -144,6 +202,8 @@ for (const key of ["dataSchemaVersion", "fields", "derived", "rules", "inputSect
 requireCondition(financeElements.filter((element) => element.type === "chart" && element.chart).length >= 2, "independent 财务参考包缺少多个直接数据图表");
 requireCondition(financeElements.some((element) => element.type === "table" && element.table), "independent 财务参考包缺少直接数据表格");
 requireCondition(!financeElements.some((element) => element.contentTemplate || element.chartBinding || element.tableBinding), "independent 财务参考包仍包含绑定");
+requireCondition(financePackageObject.assets?.length >= 3 && financeElements.some((element) => element.presetId === "cover-template:cinematic-fullbleed") && financePackageObject.pages.slice(1).every((page) => page.elements.some((element) => element.presetId === "chrome-template:brand-rail")), "财务参考包没有固化品牌封面、图片或内容页模板");
+requireCondition(reportEngine.includes('element.presetId?.startsWith("chrome-template:")') && reportEngine.includes("return []"), "显式页眉页脚模板仍会叠加默认 decorations");
 requireCondition(reportEngineTest.includes("editing one independent chart does not mutate any other chart") && reportEngineTest.includes("independent-fields") && reportEngineTest.includes("bound-finance-report-package.json"), "内核测试没有同时覆盖独立图表隔离和旧 bound 兼容");
 requireCondition(cellGridTest.includes("第一次撤销没有回到第一次应用") && cellGridTest.includes("Excel 区域粘贴失败") && cellGridTest.includes("系列重排没有携带稳定 ID") && cellGridTest.includes("图 A 修改污染图 B"), "单元格浏览器测试未覆盖逐次撤销、Excel 粘贴、稳定 ID 重排或组件隔离");
 requireCondition(app.includes("suppliedProject={{ document: compiledDocument, assetData: runtimeAssetData }}") && app.includes("浏览器存储不可用，本次内容不会自动保存"), "特化运行时资产或存储失败路径缺失");
@@ -169,6 +229,9 @@ requireCondition(packageJson.scripts["verify:release"].includes("test:assets") &
 requireCondition(manifest.requiredChecks?.includes("engine:compile") && packageJson.scripts["verify:release"].includes("engine:compile"), "发布清单或发布门禁缺少报告文档编译步骤");
 requireCondition(manifest.requiredChecks?.includes("test:dynamic-pages") && packageJson.scripts["verify:release"].includes("test:dynamic-pages"), "发布清单或发布门禁缺少动态页数 PDF 测试");
 requireCondition(manifest.requiredChecks?.includes("test:cell-grid") && packageJson.scripts["verify:release"].includes("test:cell-grid"), "发布清单或发布门禁缺少单元格浏览器测试");
+requireCondition(manifest.requiredChecks?.includes("test:templates") && packageJson.scripts["verify:release"].includes("test:templates"), "发布清单或发布门禁缺少模板测试");
+requireCondition(manifest.requiredChecks?.includes("check:brand-assets") && packageJson.scripts["verify:release"].includes("check:brand-assets"), "发布清单或发布门禁缺少品牌资源检查");
+requireCondition(manifest.templateLibrary?.coverTemplates === 5 && manifest.templateLibrary?.chromeTemplates === 3 && manifest.brandAssets?.transparentPngLogos === 3, "发布清单模板或品牌资源数量不正确");
 requireCondition(dynamicPagesTest.includes("length: 20") && dynamicPagesTest.includes('index % 2 === 0 ? "portrait" : "landscape"') && dynamicPagesTest.includes("run-inspect-pdf.mjs") && dynamicPagesTest.includes("a4Matched"), "动态页数测试没有覆盖 20 页、混合方向、真实 PDF 或逐页 A4 检查");
 for (const source of ["agentskills/agentskills", "pdfme/pdfme", "garrytan/gstack", "daymade/claude-code-skills", "microsoft/playwright", "pagedjs/pagedjs", "vivliostyle/vivliostyle.js"]) requireCondition(githubResearch.includes(source), `GitHub 调研缺少 ${source}`);
 for (const gap of ["期间滚动", "多口径快照", "单位存储", "风险快照", "外汇日序列", "页面启停"]) requireCondition(legacyParity.includes(gap), `旧版承接矩阵缺少 ${gap}`);
@@ -218,7 +281,7 @@ requireCondition(manifest.authoringModes?.newReports === "independent" && manife
 requireCondition(manifest.referencePdf?.pageCountSource === "artifacts/finance-brief/document.json" && manifest.referencePdf?.pageCountScope === "finance-brief-reference-only" && !("pages" in (manifest.referencePdf || {})), "财务参考 PDF 页数必须来自本轮编译文档，不能硬编码");
 requireCondition(reportEngine.includes("!reportPackage.pages.length") && !/\b(maximumPages|maxPages)\b/.test(reportEngine), "报告内核应只要求至少一页，不得设置固定最大页数");
 requireCondition(reportEngineArchitecture.includes("ReportDocument 1.5") && reportEngineArchitecture.includes("independent") && reportEngineArchitecture.includes("视觉覆盖"), "报告内核架构没有同时固化 independent 完整文档与 bound 视觉覆盖流程");
-requireCondition(skillLearnings.includes("v1.7.0 独立模板学习") && skillLearnings.includes("每个图表/表格可以是自己的事实源") && skillLearnings.includes("v1.6.0 内核迭代学习"), "Skill 学习文档没有固化 v1.7 独立组件经验或 v1.6 bound 经验");
+requireCondition(skillLearnings.includes("v1.8.0 可编辑模板学习") && skillLearnings.includes("v1.7.0 独立模板学习") && skillLearnings.includes("每个图表/表格可以是自己的事实源") && skillLearnings.includes("v1.6.0 内核迭代学习"), "Skill 学习文档没有固化 v1.8 模板、v1.7 独立组件或 v1.6 bound 经验");
 requireCondition(packageJson.scripts["engine:inspect-pdf"].includes("--expected-document artifacts/finance-brief/document.json") && packageJson.scripts["verify:release"].includes("engine:compile"), "PDF 页数门禁仍依赖固定页数或发布前未编译报告文档");
 
 async function verifyArtifact(entry, byteSize, sha256, label) {
@@ -242,9 +305,9 @@ await verifyArtifact(manifest.referenceGenerator?.entry, manifest.referenceGener
 await verifyArtifact(manifest.referencePdf?.entry, manifest.referencePdf?.byteSize, manifest.referencePdf?.sha256, "财务参考 PDF");
 
 if (failures.length) {
-  console.error("v1.7.0 契约检查失败：");
+  console.error("v1.8.0 契约检查失败：");
   failures.forEach((failure) => console.error(`- ${failure}`));
   process.exit(1);
 }
 
-console.log(`v1.7.0 契约检查通过：应用 ${version}，schema ${manifest.documentSchemaVersion}，内核 ${manifest.reportEngineVersion}。`);
+console.log(`v1.8.0 契约检查通过：应用 ${version}，schema ${manifest.documentSchemaVersion}，内核 ${manifest.reportEngineVersion}。`);

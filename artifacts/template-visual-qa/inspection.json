@@ -1,0 +1,158 @@
+{
+  "pdf": "temporary/template-matrix.pdf",
+  "pages": 16,
+  "pageSizes": [
+    {
+      "widthPt": 594.96,
+      "heightPt": 841.92,
+      "expectedOrientation": "portrait",
+      "actualOrientation": "portrait",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 841.92,
+      "heightPt": 594.96,
+      "expectedOrientation": "landscape",
+      "actualOrientation": "landscape",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 594.96,
+      "heightPt": 841.92,
+      "expectedOrientation": "portrait",
+      "actualOrientation": "portrait",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 841.92,
+      "heightPt": 594.96,
+      "expectedOrientation": "landscape",
+      "actualOrientation": "landscape",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 594.96,
+      "heightPt": 841.92,
+      "expectedOrientation": "portrait",
+      "actualOrientation": "portrait",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 841.92,
+      "heightPt": 594.96,
+      "expectedOrientation": "landscape",
+      "actualOrientation": "landscape",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 594.96,
+      "heightPt": 841.92,
+      "expectedOrientation": "portrait",
+      "actualOrientation": "portrait",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 841.92,
+      "heightPt": 594.96,
+      "expectedOrientation": "landscape",
+      "actualOrientation": "landscape",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 594.96,
+      "heightPt": 841.92,
+      "expectedOrientation": "portrait",
+      "actualOrientation": "portrait",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 841.92,
+      "heightPt": 594.96,
+      "expectedOrientation": "landscape",
+      "actualOrientation": "landscape",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 594.96,
+      "heightPt": 841.92,
+      "expectedOrientation": "portrait",
+      "actualOrientation": "portrait",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 841.92,
+      "heightPt": 594.96,
+      "expectedOrientation": "landscape",
+      "actualOrientation": "landscape",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 594.96,
+      "heightPt": 841.92,
+      "expectedOrientation": "portrait",
+      "actualOrientation": "portrait",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 841.92,
+      "heightPt": 594.96,
+      "expectedOrientation": "landscape",
+      "actualOrientation": "landscape",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 594.96,
+      "heightPt": 841.92,
+      "expectedOrientation": "portrait",
+      "actualOrientation": "portrait",
+      "a4Matched": true
+    },
+    {
+      "widthPt": 841.92,
+      "heightPt": 594.96,
+      "expectedOrientation": "landscape",
+      "actualOrientation": "landscape",
+      "a4Matched": true
+    }
+  ],
+  "searchableCharacters": [
+    72,
+    72,
+    75,
+    75,
+    72,
+    73,
+    72,
+    72,
+    72,
+    72,
+    346,
+    327,
+    346,
+    327,
+    346,
+    327
+  ],
+  "inkRatios": [
+    0.991218,
+    0.991216,
+    0.99181,
+    0.99115,
+    0.461624,
+    0.593054,
+    0.993735,
+    0.993735,
+    0.347724,
+    0.414732,
+    0.178194,
+    0.095759,
+    0.210961,
+    0.122477,
+    0.177594,
+    0.094519
+  ],
+  "errors": [],
+  "warnings": [],
+  "contactSheet": "artifacts/template-visual-qa/contact-sheet.png",
+  "extractedText": "temporary/template-matrix-extracted-text.txt"
+}

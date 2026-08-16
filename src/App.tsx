@@ -104,6 +104,7 @@ import {
   uid
 } from "./model";
 import { clearAssetNamespace, createAssetBlob, getAssetByteSizes, getAssets, inspectImageDimensions, putAsset, putAssetsAtomically, removeAssets } from "./asset-store";
+import { BRAND_ASSET_IDS, BUILT_IN_BRAND_ASSET_DATA, installBuiltInBrandAssets, type BrandAssetId } from "./brand-assets";
 import {
   COMPONENT_PRESETS,
   createPage,
@@ -113,6 +114,17 @@ import {
   StarterKey,
   THEMES
 } from "./templates";
+import {
+  applyChromeTemplate as applyPageChromeTemplate,
+  applyCoverTemplate as applyPageCoverTemplate,
+  CHROME_TEMPLATES,
+  coverTemplateRequiredAssetIds,
+  COVER_TEMPLATES,
+  pageSupportsChrome,
+  syncPageDecorationElements,
+  type ChromeTemplateId,
+  type CoverTemplateId
+} from "./page-templates";
 import {
   compileReportPackage,
   EngineIssue,
@@ -166,7 +178,7 @@ const chartInstances = new Set<echarts.ECharts>();
 const MASTER_CROP_ELEMENT_ID = "__page-master-image__";
 const HANDLES = ["nw", "n", "ne", "e", "se", "s", "sw", "w"] as const;
 type ResizeDirection = (typeof HANDLES)[number];
-type LeftTab = "pages" | "components";
+type LeftTab = "pages" | "components" | "templates";
 type InspectorTab = "page" | "data" | "style" | "layers" | "document";
 type AlignCommand = "left" | "center" | "right" | "top" | "middle" | "bottom";
 type DistributeCommand = "horizontal" | "vertical";
@@ -216,17 +228,6 @@ function loadInitialProject(): { document: ReportDocument; assetData: Record<str
     localStorage.removeItem(STORAGE_KEY);
   }
   return { document: createStarterReport("professional"), assetData: {} };
-}
-
-function syncPageNumberElements(report: ReportDocument) {
-  report.pages.forEach((page, index) => {
-    page.elements.forEach((element) => {
-      if (element.role !== "footer-page-number") return;
-      const value = String(index + 1).padStart(2, "0");
-      element.content = value;
-      element.runs = [{ text: value }];
-    });
-  });
 }
 
 function blobToDataUrl(blob: Blob) {
@@ -3281,7 +3282,7 @@ function EditorApp({ suppliedProject, embedded }: {
     const page = createPage(master, orientation, "新页面", "未分类", [], document.meta);
     commit((draft) => {
       draft.pages.push(page);
-      syncPageNumberElements(draft);
+      syncPageDecorationElements(draft);
     });
     setActivePageId(page.id);
     setSelectedIds(new Set());
@@ -3306,7 +3307,7 @@ function EditorApp({ suppliedProject, embedded }: {
     });
     commit((draft) => {
       draft.pages.splice(activePageIndex + 1, 0, copied);
-      syncPageNumberElements(draft);
+      syncPageDecorationElements(draft);
     });
     setActivePageId(copied.id);
     setSelectedIds(new Set());
@@ -3320,7 +3321,7 @@ function EditorApp({ suppliedProject, embedded }: {
     const nextId = document.pages[activePageIndex - 1]?.id || document.pages[activePageIndex + 1]?.id;
     commit((draft) => {
       draft.pages = draft.pages.filter((page) => page.id !== activePageId);
-      syncPageNumberElements(draft);
+      syncPageDecorationElements(draft);
     });
     setActivePageId(nextId);
     setSelectedIds(new Set());
@@ -4081,6 +4082,39 @@ function EditorApp({ suppliedProject, embedded }: {
     notify(`资产已优化，节省 ${Math.max(0, Math.round((1 - blob.size / Math.max(1, asset.byteSize)) * 100))}%`);
   };
 
+  const applyCoverLayout = (templateId: CoverTemplateId) => {
+    if (activePage.master !== "cover") return notify("封面模板只能应用到封面页");
+    const requiredAssetIds = coverTemplateRequiredAssetIds(activePage, templateId);
+    const additions = Object.fromEntries(requiredAssetIds.map((id) => [id, BUILT_IN_BRAND_ASSET_DATA[id]]));
+    commit((draft) => {
+      const page = draft.pages.find((item) => item.id === activePageId);
+      if (!page) return;
+      applyPageCoverTemplate(page, draft.meta, templateId, draft.assets);
+      installBuiltInBrandAssets(draft, additions, requiredAssetIds);
+    });
+    setAssetData((current) => ({ ...current, ...additions }));
+    setSelectedIds(new Set());
+    setInspectorTab("page");
+    notify(`已应用${COVER_TEMPLATES.find((item) => item.id === templateId)?.label || "封面模板"}`);
+  };
+
+  const applyChromeLayout = (templateId: ChromeTemplateId) => {
+    if (!pageSupportsChrome(activePage)) return notify("页眉页脚模板适用于章节页、标准页和数据页");
+    const requiredAssetIds: BrandAssetId[] = [BRAND_ASSET_IDS.logoColor];
+    const additions = Object.fromEntries(requiredAssetIds.map((id) => [id, BUILT_IN_BRAND_ASSET_DATA[id]]));
+    commit((draft) => {
+      const index = draft.pages.findIndex((item) => item.id === activePageId);
+      const page = draft.pages[index];
+      if (!page) return;
+      applyPageChromeTemplate(page, draft.meta, templateId, index + 1, draft.pages.length, draft.pageSetup.footerMode);
+      installBuiltInBrandAssets(draft, additions, requiredAssetIds);
+    });
+    setAssetData((current) => ({ ...current, ...additions }));
+    setSelectedIds(new Set());
+    setInspectorTab("page");
+    notify(`已应用${CHROME_TEMPLATES.find((item) => item.id === templateId)?.label || "页眉页脚模板"}`);
+  };
+
   const filteredPresets = useMemo(() => COMPONENT_PRESETS.filter((preset) =>
     preset.label.toLowerCase().includes(search.toLowerCase()) || preset.id.includes(search.toLowerCase()) || preset.description.toLowerCase().includes(search.toLowerCase())
   ), [search]);
@@ -4100,7 +4134,7 @@ function EditorApp({ suppliedProject, embedded }: {
         <header className="topbar">
           <div className="brand-block">
             <LayoutTemplate size={20} strokeWidth={ICON_STROKE} />
-            <div><strong>{embedded?.title || "本地报告工坊"}</strong><span>毫米级 A4 排版 · v1.7</span></div>
+            <div><strong>{embedded?.title || "本地报告工坊"}</strong><span>毫米级 A4 排版 · v1.8</span></div>
           </div>
           {structureEditing && <div className="toolbar-group file-actions">
             {!embedded && <div className="menu-anchor">
@@ -4136,9 +4170,10 @@ function EditorApp({ suppliedProject, embedded }: {
         <div className="workspace">
           <aside className={`left-panel ${leftOpen ? "open" : "closed"}`}>
             <IconButton label="关闭页面面板" className="panel-close" onClick={() => setLeftOpen(false)}><X size={15} /></IconButton>
-            <div className={`panel-tabs ${structureEditing ? "two-tabs" : "one-tab"}`}>
+            <div className={`panel-tabs ${structureEditing ? "three-tabs" : "one-tab"}`}>
               <button type="button" className={leftTab === "pages" ? "active" : ""} onClick={() => setLeftTab("pages")}><FileText size={14} />页面</button>
               {structureEditing && <button type="button" className={leftTab === "components" ? "active" : ""} onClick={() => setLeftTab("components")}><Plus size={14} />组件</button>}
+              {structureEditing && <button type="button" className={leftTab === "templates" ? "active" : ""} onClick={() => setLeftTab("templates")}><LayoutTemplate size={14} />模板</button>}
             </div>
             {leftTab === "pages" ? (
               <div className="panel-content pages-panel">
@@ -4154,7 +4189,7 @@ function EditorApp({ suppliedProject, embedded }: {
                   <button type="button" onClick={() => addPage("standard", "landscape")}><Plus size={15} />横向页</button>
                 </div>}
               </div>
-            ) : (
+            ) : leftTab === "components" ? (
               <div className="panel-content component-panel">
                 <label className="search-box"><Search size={14} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="搜索组件" /></label>
                 {(["basic", "composition"] as const).map((category) => {
@@ -4171,6 +4206,40 @@ function EditorApp({ suppliedProject, embedded }: {
                   </section>;
                 })}
                 {!filteredPresets.length && <div className="empty-state"><Search size={22} /><span>没有匹配组件</span></div>}
+              </div>
+            ) : (
+              <div className="panel-content template-panel">
+                <section className="template-section">
+                  <div className="template-section-heading"><strong>封面</strong><span>{activePage.orientation === "portrait" ? "竖版" : "横版"}</span></div>
+                  <div className="template-card-grid cover-template-grid">
+                    {COVER_TEMPLATES.map((template) => {
+                      const active = activePage.elements.some((item) => item.presetId === `cover-template:${template.id}`);
+                      const disabled = activePage.master !== "cover";
+                      return <button type="button" className={`template-card ${active ? "active" : ""}`} disabled={disabled} key={template.id} onClick={() => applyCoverLayout(template.id)} title={disabled ? "先选择封面页" : `应用${template.label}`}>
+                        <span className="template-preview-shell">
+                          <span className={`cover-template-preview preview-${template.id} ${activePage.orientation}`}>
+                            <img src={BUILT_IN_BRAND_ASSET_DATA[template.previewAssetId]} alt="" />
+                            <span className="preview-overlay" /><span className="preview-logo" /><span className="preview-title-line one" /><span className="preview-title-line two" /><span className="preview-meta-line" />
+                          </span>
+                        </span>
+                        <strong>{template.label}</strong><small>{template.source}</small>
+                      </button>;
+                    })}
+                  </div>
+                </section>
+                <section className="template-section">
+                  <div className="template-section-heading"><strong>页眉页脚</strong><span>{pageSupportsChrome(activePage) ? "当前页" : "内容页"}</span></div>
+                  <div className="template-card-grid chrome-template-grid">
+                    {CHROME_TEMPLATES.map((template) => {
+                      const active = activePage.elements.some((item) => item.presetId === `chrome-template:${template.id}`);
+                      const disabled = !pageSupportsChrome(activePage);
+                      return <button type="button" className={`template-card ${active ? "active" : ""}`} disabled={disabled} key={template.id} onClick={() => applyChromeLayout(template.id)} title={disabled ? "选择章节页、标准页或数据页" : `应用${template.label}`}>
+                        <span className={`chrome-template-preview preview-${template.id}`}><span className="chrome-rail" /><span className="chrome-logo" /><span className="chrome-head-rule" /><span className="chrome-foot-rule" /><span className="chrome-page" /></span>
+                        <strong>{template.label}</strong><small>{template.source}</small>
+                      </button>;
+                    })}
+                  </div>
+                </section>
               </div>
             )}
           </aside>
@@ -4303,7 +4372,7 @@ function EditorApp({ suppliedProject, embedded }: {
                 selectedElements.length ? <StyleInspector elements={selectedElements} update={updateSelected} theme={document.theme} /> : <InspectorEmpty count={0} icon={<Palette size={24} />} title="未选择元素" />
               )}
               {inspectorTab === "layers" && <LayersInspector page={activePage} selectedIds={selectedIds} select={setSelectedIds} update={(recipe) => commit((draft) => { const page = draft.pages.find((item) => item.id === activePageId); if (page) recipe(page); })} />}
-              {inspectorTab === "document" && <DocumentInspector document={document} assetData={assetData} readOnlyMeta={boundPrecisionMode} update={commit} exportZip={() => void exportZip()} exportJson={exportJson} cleanupUnusedAssets={() => void cleanupUnusedAssets()} optimizeAsset={(id) => void optimizeAsset(id)} keepOriginalImages={keepOriginalImages} setKeepOriginalImages={setKeepOriginalImages} />}
+              {inspectorTab === "document" && <DocumentInspector document={document} assetData={assetData} readOnlyMeta={boundPrecisionMode} update={(recipe) => commit((draft) => { recipe(draft); syncPageDecorationElements(draft); })} exportZip={() => void exportZip()} exportJson={exportJson} cleanupUnusedAssets={() => void cleanupUnusedAssets()} optimizeAsset={(id) => void optimizeAsset(id)} keepOriginalImages={keepOriginalImages} setKeepOriginalImages={setKeepOriginalImages} />}
             </div>
           </aside>
         </div>
@@ -4562,6 +4631,7 @@ function PageInspector({ document, page, assetData, update, uploadBackgroundImag
   const updatePage = (recipe: (draft: ReportPage) => void) => update((draft) => {
     const target = draft.pages.find((item) => item.id === page.id);
     if (target) recipe(target);
+    syncPageDecorationElements(draft);
   });
   return <>
     <div className="selection-heading"><span className="type-icon"><FileImage size={16} /></span><div><strong>{page.name}</strong><small>{page.orientation === "portrait" ? "A4 纵向" : "A4 横向"} · {page.master}</small></div></div>

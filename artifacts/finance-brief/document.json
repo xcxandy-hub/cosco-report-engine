@@ -48,7 +48,44 @@
     "body",
     "numeric"
   ],
-  "assets": [],
+  "assets": [
+    {
+      "id": "builtin-cosco-logo-color-v1",
+      "kind": "image",
+      "mime": "image/png",
+      "width": 1024,
+      "height": 663,
+      "byteSize": 44109,
+      "hash": "f944dbd16b59cfcea7206296c2c77acc9ccb7ef102d252a9b89fd2e6d61055e1",
+      "sourceName": "cosco-logo-color.png",
+      "optimized": true,
+      "originalRetained": false
+    },
+    {
+      "id": "builtin-cosco-logo-white-v1",
+      "kind": "image",
+      "mime": "image/png",
+      "width": 1024,
+      "height": 663,
+      "byteSize": 34440,
+      "hash": "f54876776ed20b028aa57dbd56465284f9cc956051658714ad55650d0abb6679",
+      "sourceName": "cosco-logo-white.png",
+      "optimized": true,
+      "originalRetained": false
+    },
+    {
+      "id": "builtin-cover-city-ship-v1",
+      "kind": "image",
+      "mime": "image/jpeg",
+      "width": 1920,
+      "height": 1210,
+      "byteSize": 628342,
+      "hash": "aab835231134a7bda5fffdece2ef8ca9b828efc62c014c7a9cf681a3501ccb5f",
+      "sourceName": "cover-city-ship.jpg",
+      "optimized": true,
+      "originalRetained": false
+    }
+  ],
   "pages": [
     {
       "id": "finance-cover",
@@ -58,34 +95,97 @@
       "orientation": "portrait",
       "elements": [
         {
-          "id": "cover-band",
-          "type": "divider",
-          "name": "cover-band",
-          "x": 20,
-          "y": 40,
-          "w": 3,
-          "h": 92,
+          "id": "finance-cover--cover-image",
+          "type": "image",
+          "name": "封面图片",
+          "x": 0,
+          "y": 0,
+          "w": 210,
+          "h": 297,
           "z": 1,
+          "presetId": "cover-template:cinematic-fullbleed",
+          "presetSlot": "cover-image",
+          "assetId": "builtin-cover-city-ship-v1",
+          "imageStyle": {
+            "overlayKind": "none",
+            "overlayColor": "primary",
+            "overlayColor2": "transparent",
+            "overlayAngle": 0,
+            "blendMode": "multiply",
+            "strength": 0.5,
+            "grade": "film",
+            "vignette": "light"
+          },
           "style": {
-            "background": "primary"
+            "background": "surface"
           }
         },
         {
-          "id": "cover-type",
-          "type": "text",
-          "name": "cover-type",
-          "x": 31,
-          "y": 43,
-          "w": 95,
-          "h": 8,
+          "id": "finance-cover--cover-overlay",
+          "type": "box",
+          "name": "电影感蒙版",
+          "x": 0,
+          "y": 0,
+          "w": 132,
+          "h": 297,
           "z": 2,
-          "semanticRole": "body",
+          "presetId": "cover-template:cinematic-fullbleed",
+          "presetSlot": "cover-overlay",
+          "style": {
+            "background": "primary",
+            "opacity": 0.84
+          }
+        },
+        {
+          "id": "finance-cover--cover-accent",
+          "type": "divider",
+          "name": "封面强调线",
+          "x": 20,
+          "y": 91,
+          "w": 18,
+          "h": 1.2,
+          "z": 3,
+          "presetId": "cover-template:cinematic-fullbleed",
+          "presetSlot": "cover-accent",
+          "style": {
+            "background": "accent"
+          }
+        },
+        {
+          "id": "finance-cover--cover-logo",
+          "type": "image",
+          "name": "白色 Logo",
+          "x": 18,
+          "y": 16,
+          "w": 34,
+          "h": 22,
+          "z": 4,
+          "presetId": "cover-template:cinematic-fullbleed",
+          "presetSlot": "cover-logo",
+          "assetId": "builtin-cosco-logo-white-v1",
+          "style": {
+            "background": "transparent"
+          }
+        },
+        {
+          "id": "finance-cover--cover-kicker",
+          "type": "text",
+          "name": "报告类型",
+          "x": 20,
+          "y": 100,
+          "w": 98,
+          "h": 7,
+          "z": 5,
+          "presetId": "cover-template:cinematic-fullbleed",
+          "presetSlot": "cover-kicker",
           "style": {
             "fontSize": 10,
             "fontSlot": "body",
-            "color": "primary",
+            "color": "white",
+            "background": "transparent",
             "lineHeight": 1.2,
-            "fontWeight": 650
+            "padding": 0,
+            "fontWeight": 700
           },
           "content": "财务分析简报",
           "runs": [
@@ -95,21 +195,25 @@
           ]
         },
         {
-          "id": "cover-title",
+          "id": "finance-cover--cover-title",
           "type": "text",
           "name": "封面标题",
-          "x": 31,
-          "y": 62,
-          "w": 150,
-          "h": 44,
-          "z": 3,
+          "x": 20,
+          "y": 115,
+          "w": 98,
+          "h": 58,
+          "z": 6,
           "semanticRole": "title",
+          "presetId": "cover-template:cinematic-fullbleed",
+          "presetSlot": "cover-title",
           "style": {
-            "fontSize": 28,
+            "fontSize": 32,
             "fontSlot": "display",
-            "color": "text",
+            "color": "white",
+            "background": "transparent",
             "lineHeight": 1.2,
-            "fontWeight": 750
+            "padding": 0,
+            "fontWeight": 760
           },
           "content": "示例航运企业\n财务分析简报",
           "runs": [
@@ -119,20 +223,24 @@
           ]
         },
         {
-          "id": "cover-subtitle",
+          "id": "finance-cover--cover-subtitle",
           "type": "text",
-          "name": "cover-subtitle",
-          "x": 31,
-          "y": 116,
-          "w": 145,
-          "h": 25,
-          "z": 4,
-          "semanticRole": "body",
+          "name": "封面副标题",
+          "x": 20,
+          "y": 181,
+          "w": 97,
+          "h": 30,
+          "z": 7,
+          "presetId": "cover-template:cinematic-fullbleed",
+          "presetSlot": "cover-subtitle",
           "style": {
             "fontSize": 12,
             "fontSlot": "body",
-            "color": "muted",
-            "lineHeight": 1.5
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.5,
+            "padding": 0,
+            "opacity": 0.9
           },
           "content": "经营表现、量价趋势、成本结构与财务风险观察",
           "runs": [
@@ -142,20 +250,23 @@
           ]
         },
         {
-          "id": "cover-period",
+          "id": "finance-cover--cover-period",
           "type": "text",
-          "name": "cover-period",
-          "x": 31,
-          "y": 235,
-          "w": 110,
-          "h": 8,
-          "z": 5,
-          "semanticRole": "body",
+          "name": "报告期",
+          "x": 20,
+          "y": 248,
+          "w": 98,
+          "h": 7,
+          "z": 8,
+          "presetId": "cover-template:cinematic-fullbleed",
+          "presetSlot": "cover-period",
           "style": {
             "fontSize": 10,
             "fontSlot": "body",
-            "color": "text",
-            "lineHeight": 1.5,
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
             "fontWeight": 650
           },
           "content": "报告期：2026年7月",
@@ -166,20 +277,24 @@
           ]
         },
         {
-          "id": "cover-author",
+          "id": "finance-cover--cover-author",
           "type": "text",
-          "name": "cover-author",
-          "x": 31,
-          "y": 250,
-          "w": 110,
-          "h": 7,
-          "z": 6,
-          "semanticRole": "body",
+          "name": "编制部门",
+          "x": 20,
+          "y": 262,
+          "w": 98,
+          "h": 6,
+          "z": 9,
+          "presetId": "cover-template:cinematic-fullbleed",
+          "presetSlot": "cover-author",
           "style": {
             "fontSize": 8,
             "fontSlot": "body",
-            "color": "muted",
-            "lineHeight": 1.5
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "opacity": 0.82
           },
           "content": "编制：财务管理部门",
           "runs": [
@@ -189,21 +304,24 @@
           ]
         },
         {
-          "id": "cover-confidentiality",
+          "id": "finance-cover--cover-confidentiality",
           "type": "text",
-          "name": "cover-confidentiality",
-          "x": 31,
-          "y": 265,
-          "w": 110,
-          "h": 7,
-          "z": 7,
-          "semanticRole": "body",
+          "name": "密级",
+          "x": 20,
+          "y": 275,
+          "w": 98,
+          "h": 6,
+          "z": 10,
+          "presetId": "cover-template:cinematic-fullbleed",
+          "presetSlot": "cover-confidentiality",
           "style": {
             "fontSize": 8,
             "fontSlot": "body",
-            "color": "accent",
-            "lineHeight": 1.5,
-            "fontWeight": 650
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700
           },
           "content": "内部资料 注意保密",
           "runs": [
@@ -221,140 +339,6 @@
       "master": "data",
       "orientation": "landscape",
       "elements": [
-        {
-          "id": "finance-overview--header-left",
-          "role": "header-left",
-          "type": "text",
-          "name": "页眉机构",
-          "x": 18,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 1,
-          "content": "示例航运企业",
-          "runs": [
-            {
-              "text": "示例航运企业"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-overview--header-right",
-          "role": "header-right",
-          "type": "text",
-          "name": "页眉章节",
-          "x": 158.94,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 2,
-          "content": "核心指标与经营判断",
-          "runs": [
-            {
-              "text": "核心指标与经营判断"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
-        {
-          "id": "finance-overview--header-rule",
-          "role": "header-rule",
-          "type": "divider",
-          "name": "页眉线",
-          "x": 18,
-          "y": 13,
-          "w": 261,
-          "h": 0.25,
-          "z": 3,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-overview--footer-rule",
-          "role": "footer-rule",
-          "type": "divider",
-          "name": "页脚线",
-          "x": 18,
-          "y": 201,
-          "w": 261,
-          "h": 0.25,
-          "z": 4,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-overview--footer-left",
-          "role": "footer-left",
-          "type": "text",
-          "name": "页脚密级",
-          "x": 18,
-          "y": 203,
-          "w": 187.92,
-          "h": 4,
-          "z": 5,
-          "content": "内部资料 注意保密",
-          "runs": [
-            {
-              "text": "内部资料 注意保密"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-overview--footer-page-number",
-          "role": "footer-page-number",
-          "type": "text",
-          "name": "页码",
-          "x": 232.01999999999998,
-          "y": 203,
-          "w": 46.98,
-          "h": 4,
-          "z": 6,
-          "content": "02",
-          "runs": [
-            {
-              "text": "02"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "numeric",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
         {
           "id": "overview-title",
           "type": "text",
@@ -1165,6 +1149,180 @@
               "text": "资料来源：本地财务系统（示例）"
             }
           ]
+        },
+        {
+          "id": "finance-overview--chrome-rail",
+          "type": "box",
+          "name": "页面侧轨",
+          "x": 0,
+          "y": 0,
+          "w": 8,
+          "h": 210,
+          "z": 36,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-overview--chrome-rail-accent",
+          "type": "box",
+          "name": "侧轨强调",
+          "x": 0,
+          "y": 22,
+          "w": 8,
+          "h": 22,
+          "z": 37,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail-accent",
+          "style": {
+            "background": "accent"
+          }
+        },
+        {
+          "id": "finance-overview--header-logo",
+          "type": "image",
+          "name": "页眉 Logo",
+          "x": 13,
+          "y": 5,
+          "w": 17,
+          "h": 11,
+          "z": 38,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-logo",
+          "assetId": "builtin-cosco-logo-color-v1",
+          "style": {
+            "background": "transparent"
+          }
+        },
+        {
+          "id": "finance-overview--header-section",
+          "type": "text",
+          "name": "页眉章节",
+          "x": 35,
+          "y": 7,
+          "w": 246,
+          "h": 6,
+          "z": 39,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-section",
+          "role": "header-right",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "primary",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "right"
+          },
+          "content": "核心指标与经营判断",
+          "runs": [
+            {
+              "text": "核心指标与经营判断"
+            }
+          ]
+        },
+        {
+          "id": "finance-overview--header-rule",
+          "type": "divider",
+          "name": "页眉线",
+          "x": 13,
+          "y": 18,
+          "w": 268,
+          "h": 0.5,
+          "z": 40,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-rule",
+          "role": "header-rule",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-overview--footer-organization",
+          "type": "text",
+          "name": "页脚机构",
+          "x": 13,
+          "y": 201,
+          "w": 92,
+          "h": 5,
+          "z": 41,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-organization",
+          "role": "footer-left",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0
+          },
+          "content": "示例航运企业",
+          "runs": [
+            {
+              "text": "示例航运企业"
+            }
+          ]
+        },
+        {
+          "id": "finance-overview--footer-confidentiality",
+          "type": "text",
+          "name": "页脚密级",
+          "x": 185,
+          "y": 201,
+          "w": 78,
+          "h": 5,
+          "z": 42,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-confidentiality",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "align": "right"
+          },
+          "content": "内部资料 注意保密",
+          "runs": [
+            {
+              "text": "内部资料 注意保密"
+            }
+          ]
+        },
+        {
+          "id": "finance-overview--footer-page",
+          "type": "text",
+          "name": "页码",
+          "x": 0,
+          "y": 195,
+          "w": 8,
+          "h": 7,
+          "z": 43,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-page",
+          "role": "footer-page-number",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "numeric",
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "center"
+          },
+          "content": "02",
+          "runs": [
+            {
+              "text": "02"
+            }
+          ]
         }
       ]
     },
@@ -1175,140 +1333,6 @@
       "master": "data",
       "orientation": "landscape",
       "elements": [
-        {
-          "id": "finance-drivers--header-left",
-          "role": "header-left",
-          "type": "text",
-          "name": "页眉机构",
-          "x": 18,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 1,
-          "content": "示例航运企业",
-          "runs": [
-            {
-              "text": "示例航运企业"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-drivers--header-right",
-          "role": "header-right",
-          "type": "text",
-          "name": "页眉章节",
-          "x": 158.94,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 2,
-          "content": "业绩综述",
-          "runs": [
-            {
-              "text": "业绩综述"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
-        {
-          "id": "finance-drivers--header-rule",
-          "role": "header-rule",
-          "type": "divider",
-          "name": "页眉线",
-          "x": 18,
-          "y": 13,
-          "w": 261,
-          "h": 0.25,
-          "z": 3,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-drivers--footer-rule",
-          "role": "footer-rule",
-          "type": "divider",
-          "name": "页脚线",
-          "x": 18,
-          "y": 201,
-          "w": 261,
-          "h": 0.25,
-          "z": 4,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-drivers--footer-left",
-          "role": "footer-left",
-          "type": "text",
-          "name": "页脚密级",
-          "x": 18,
-          "y": 203,
-          "w": 187.92,
-          "h": 4,
-          "z": 5,
-          "content": "内部资料 注意保密",
-          "runs": [
-            {
-              "text": "内部资料 注意保密"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-drivers--footer-page-number",
-          "role": "footer-page-number",
-          "type": "text",
-          "name": "页码",
-          "x": 232.01999999999998,
-          "y": 203,
-          "w": 46.98,
-          "h": 4,
-          "z": 6,
-          "content": "03",
-          "runs": [
-            {
-              "text": "03"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "numeric",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
         {
           "id": "drivers-title",
           "type": "text",
@@ -1552,6 +1576,180 @@
               "text": "资料来源：本地财务系统（示例）"
             }
           ]
+        },
+        {
+          "id": "finance-drivers--chrome-rail",
+          "type": "box",
+          "name": "页面侧轨",
+          "x": 0,
+          "y": 0,
+          "w": 8,
+          "h": 210,
+          "z": 14,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-drivers--chrome-rail-accent",
+          "type": "box",
+          "name": "侧轨强调",
+          "x": 0,
+          "y": 22,
+          "w": 8,
+          "h": 22,
+          "z": 15,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail-accent",
+          "style": {
+            "background": "accent"
+          }
+        },
+        {
+          "id": "finance-drivers--header-logo",
+          "type": "image",
+          "name": "页眉 Logo",
+          "x": 13,
+          "y": 5,
+          "w": 17,
+          "h": 11,
+          "z": 16,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-logo",
+          "assetId": "builtin-cosco-logo-color-v1",
+          "style": {
+            "background": "transparent"
+          }
+        },
+        {
+          "id": "finance-drivers--header-section",
+          "type": "text",
+          "name": "页眉章节",
+          "x": 35,
+          "y": 7,
+          "w": 246,
+          "h": 6,
+          "z": 17,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-section",
+          "role": "header-right",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "primary",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "right"
+          },
+          "content": "业绩综述",
+          "runs": [
+            {
+              "text": "业绩综述"
+            }
+          ]
+        },
+        {
+          "id": "finance-drivers--header-rule",
+          "type": "divider",
+          "name": "页眉线",
+          "x": 13,
+          "y": 18,
+          "w": 268,
+          "h": 0.5,
+          "z": 18,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-rule",
+          "role": "header-rule",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-drivers--footer-organization",
+          "type": "text",
+          "name": "页脚机构",
+          "x": 13,
+          "y": 201,
+          "w": 92,
+          "h": 5,
+          "z": 19,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-organization",
+          "role": "footer-left",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0
+          },
+          "content": "示例航运企业",
+          "runs": [
+            {
+              "text": "示例航运企业"
+            }
+          ]
+        },
+        {
+          "id": "finance-drivers--footer-confidentiality",
+          "type": "text",
+          "name": "页脚密级",
+          "x": 185,
+          "y": 201,
+          "w": 78,
+          "h": 5,
+          "z": 20,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-confidentiality",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "align": "right"
+          },
+          "content": "内部资料 注意保密",
+          "runs": [
+            {
+              "text": "内部资料 注意保密"
+            }
+          ]
+        },
+        {
+          "id": "finance-drivers--footer-page",
+          "type": "text",
+          "name": "页码",
+          "x": 0,
+          "y": 195,
+          "w": 8,
+          "h": 7,
+          "z": 21,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-page",
+          "role": "footer-page-number",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "numeric",
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "center"
+          },
+          "content": "03",
+          "runs": [
+            {
+              "text": "03"
+            }
+          ]
         }
       ]
     },
@@ -1562,140 +1760,6 @@
       "master": "data",
       "orientation": "portrait",
       "elements": [
-        {
-          "id": "finance-revenue--header-left",
-          "role": "header-left",
-          "type": "text",
-          "name": "页眉机构",
-          "x": 18,
-          "y": 7,
-          "w": 80.04,
-          "h": 4.5,
-          "z": 1,
-          "content": "示例航运企业",
-          "runs": [
-            {
-              "text": "示例航运企业"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-revenue--header-right",
-          "role": "header-right",
-          "type": "text",
-          "name": "页眉章节",
-          "x": 111.96000000000001,
-          "y": 7,
-          "w": 80.04,
-          "h": 4.5,
-          "z": 2,
-          "content": "收入与结构分析",
-          "runs": [
-            {
-              "text": "收入与结构分析"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
-        {
-          "id": "finance-revenue--header-rule",
-          "role": "header-rule",
-          "type": "divider",
-          "name": "页眉线",
-          "x": 18,
-          "y": 13,
-          "w": 174,
-          "h": 0.25,
-          "z": 3,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-revenue--footer-rule",
-          "role": "footer-rule",
-          "type": "divider",
-          "name": "页脚线",
-          "x": 18,
-          "y": 288,
-          "w": 174,
-          "h": 0.25,
-          "z": 4,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-revenue--footer-left",
-          "role": "footer-left",
-          "type": "text",
-          "name": "页脚密级",
-          "x": 18,
-          "y": 290,
-          "w": 125.28,
-          "h": 4,
-          "z": 5,
-          "content": "内部资料 注意保密",
-          "runs": [
-            {
-              "text": "内部资料 注意保密"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-revenue--footer-page-number",
-          "role": "footer-page-number",
-          "type": "text",
-          "name": "页码",
-          "x": 160.67999999999998,
-          "y": 290,
-          "w": 31.32,
-          "h": 4,
-          "z": 6,
-          "content": "04",
-          "runs": [
-            {
-              "text": "04"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "numeric",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
         {
           "id": "revenue-title",
           "type": "text",
@@ -2021,6 +2085,180 @@
               "text": "资料来源：本地财务系统（示例）"
             }
           ]
+        },
+        {
+          "id": "finance-revenue--chrome-rail",
+          "type": "box",
+          "name": "页面侧轨",
+          "x": 0,
+          "y": 0,
+          "w": 7,
+          "h": 297,
+          "z": 18,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-revenue--chrome-rail-accent",
+          "type": "box",
+          "name": "侧轨强调",
+          "x": 0,
+          "y": 22,
+          "w": 7,
+          "h": 22,
+          "z": 19,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail-accent",
+          "style": {
+            "background": "accent"
+          }
+        },
+        {
+          "id": "finance-revenue--header-logo",
+          "type": "image",
+          "name": "页眉 Logo",
+          "x": 13,
+          "y": 5,
+          "w": 17,
+          "h": 11,
+          "z": 20,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-logo",
+          "assetId": "builtin-cosco-logo-color-v1",
+          "style": {
+            "background": "transparent"
+          }
+        },
+        {
+          "id": "finance-revenue--header-section",
+          "type": "text",
+          "name": "页眉章节",
+          "x": 35,
+          "y": 7,
+          "w": 159,
+          "h": 6,
+          "z": 21,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-section",
+          "role": "header-right",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "primary",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "right"
+          },
+          "content": "收入与结构分析",
+          "runs": [
+            {
+              "text": "收入与结构分析"
+            }
+          ]
+        },
+        {
+          "id": "finance-revenue--header-rule",
+          "type": "divider",
+          "name": "页眉线",
+          "x": 13,
+          "y": 18,
+          "w": 181,
+          "h": 0.5,
+          "z": 22,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-rule",
+          "role": "header-rule",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-revenue--footer-organization",
+          "type": "text",
+          "name": "页脚机构",
+          "x": 13,
+          "y": 288,
+          "w": 92,
+          "h": 5,
+          "z": 23,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-organization",
+          "role": "footer-left",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0
+          },
+          "content": "示例航运企业",
+          "runs": [
+            {
+              "text": "示例航运企业"
+            }
+          ]
+        },
+        {
+          "id": "finance-revenue--footer-confidentiality",
+          "type": "text",
+          "name": "页脚密级",
+          "x": 98,
+          "y": 288,
+          "w": 78,
+          "h": 5,
+          "z": 24,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-confidentiality",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "align": "right"
+          },
+          "content": "内部资料 注意保密",
+          "runs": [
+            {
+              "text": "内部资料 注意保密"
+            }
+          ]
+        },
+        {
+          "id": "finance-revenue--footer-page",
+          "type": "text",
+          "name": "页码",
+          "x": 0,
+          "y": 282,
+          "w": 7,
+          "h": 7,
+          "z": 25,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-page",
+          "role": "footer-page-number",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "numeric",
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "center"
+          },
+          "content": "04",
+          "runs": [
+            {
+              "text": "04"
+            }
+          ]
         }
       ]
     },
@@ -2031,140 +2269,6 @@
       "master": "data",
       "orientation": "landscape",
       "elements": [
-        {
-          "id": "finance-trade--header-left",
-          "role": "header-left",
-          "type": "text",
-          "name": "页眉机构",
-          "x": 18,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 1,
-          "content": "示例航运企业",
-          "runs": [
-            {
-              "text": "示例航运企业"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-trade--header-right",
-          "role": "header-right",
-          "type": "text",
-          "name": "页眉章节",
-          "x": 158.94,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 2,
-          "content": "收入与结构分析",
-          "runs": [
-            {
-              "text": "收入与结构分析"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
-        {
-          "id": "finance-trade--header-rule",
-          "role": "header-rule",
-          "type": "divider",
-          "name": "页眉线",
-          "x": 18,
-          "y": 13,
-          "w": 261,
-          "h": 0.25,
-          "z": 3,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-trade--footer-rule",
-          "role": "footer-rule",
-          "type": "divider",
-          "name": "页脚线",
-          "x": 18,
-          "y": 201,
-          "w": 261,
-          "h": 0.25,
-          "z": 4,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-trade--footer-left",
-          "role": "footer-left",
-          "type": "text",
-          "name": "页脚密级",
-          "x": 18,
-          "y": 203,
-          "w": 187.92,
-          "h": 4,
-          "z": 5,
-          "content": "内部资料 注意保密",
-          "runs": [
-            {
-              "text": "内部资料 注意保密"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-trade--footer-page-number",
-          "role": "footer-page-number",
-          "type": "text",
-          "name": "页码",
-          "x": 232.01999999999998,
-          "y": 203,
-          "w": 46.98,
-          "h": 4,
-          "z": 6,
-          "content": "05",
-          "runs": [
-            {
-              "text": "05"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "numeric",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
         {
           "id": "trade-title",
           "type": "text",
@@ -2405,6 +2509,180 @@
               "text": "资料来源：本地财务系统（示例）"
             }
           ]
+        },
+        {
+          "id": "finance-trade--chrome-rail",
+          "type": "box",
+          "name": "页面侧轨",
+          "x": 0,
+          "y": 0,
+          "w": 8,
+          "h": 210,
+          "z": 14,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-trade--chrome-rail-accent",
+          "type": "box",
+          "name": "侧轨强调",
+          "x": 0,
+          "y": 22,
+          "w": 8,
+          "h": 22,
+          "z": 15,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail-accent",
+          "style": {
+            "background": "accent"
+          }
+        },
+        {
+          "id": "finance-trade--header-logo",
+          "type": "image",
+          "name": "页眉 Logo",
+          "x": 13,
+          "y": 5,
+          "w": 17,
+          "h": 11,
+          "z": 16,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-logo",
+          "assetId": "builtin-cosco-logo-color-v1",
+          "style": {
+            "background": "transparent"
+          }
+        },
+        {
+          "id": "finance-trade--header-section",
+          "type": "text",
+          "name": "页眉章节",
+          "x": 35,
+          "y": 7,
+          "w": 246,
+          "h": 6,
+          "z": 17,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-section",
+          "role": "header-right",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "primary",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "right"
+          },
+          "content": "收入与结构分析",
+          "runs": [
+            {
+              "text": "收入与结构分析"
+            }
+          ]
+        },
+        {
+          "id": "finance-trade--header-rule",
+          "type": "divider",
+          "name": "页眉线",
+          "x": 13,
+          "y": 18,
+          "w": 268,
+          "h": 0.5,
+          "z": 18,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-rule",
+          "role": "header-rule",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-trade--footer-organization",
+          "type": "text",
+          "name": "页脚机构",
+          "x": 13,
+          "y": 201,
+          "w": 92,
+          "h": 5,
+          "z": 19,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-organization",
+          "role": "footer-left",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0
+          },
+          "content": "示例航运企业",
+          "runs": [
+            {
+              "text": "示例航运企业"
+            }
+          ]
+        },
+        {
+          "id": "finance-trade--footer-confidentiality",
+          "type": "text",
+          "name": "页脚密级",
+          "x": 185,
+          "y": 201,
+          "w": 78,
+          "h": 5,
+          "z": 20,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-confidentiality",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "align": "right"
+          },
+          "content": "内部资料 注意保密",
+          "runs": [
+            {
+              "text": "内部资料 注意保密"
+            }
+          ]
+        },
+        {
+          "id": "finance-trade--footer-page",
+          "type": "text",
+          "name": "页码",
+          "x": 0,
+          "y": 195,
+          "w": 8,
+          "h": 7,
+          "z": 21,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-page",
+          "role": "footer-page-number",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "numeric",
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "center"
+          },
+          "content": "05",
+          "runs": [
+            {
+              "text": "05"
+            }
+          ]
         }
       ]
     },
@@ -2415,140 +2693,6 @@
       "master": "data",
       "orientation": "landscape",
       "elements": [
-        {
-          "id": "finance-freight--header-left",
-          "role": "header-left",
-          "type": "text",
-          "name": "页眉机构",
-          "x": 18,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 1,
-          "content": "示例航运企业",
-          "runs": [
-            {
-              "text": "示例航运企业"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-freight--header-right",
-          "role": "header-right",
-          "type": "text",
-          "name": "页眉章节",
-          "x": 158.94,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 2,
-          "content": "收入与结构分析",
-          "runs": [
-            {
-              "text": "收入与结构分析"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
-        {
-          "id": "finance-freight--header-rule",
-          "role": "header-rule",
-          "type": "divider",
-          "name": "页眉线",
-          "x": 18,
-          "y": 13,
-          "w": 261,
-          "h": 0.25,
-          "z": 3,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-freight--footer-rule",
-          "role": "footer-rule",
-          "type": "divider",
-          "name": "页脚线",
-          "x": 18,
-          "y": 201,
-          "w": 261,
-          "h": 0.25,
-          "z": 4,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-freight--footer-left",
-          "role": "footer-left",
-          "type": "text",
-          "name": "页脚密级",
-          "x": 18,
-          "y": 203,
-          "w": 187.92,
-          "h": 4,
-          "z": 5,
-          "content": "内部资料 注意保密",
-          "runs": [
-            {
-              "text": "内部资料 注意保密"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-freight--footer-page-number",
-          "role": "footer-page-number",
-          "type": "text",
-          "name": "页码",
-          "x": 232.01999999999998,
-          "y": 203,
-          "w": 46.98,
-          "h": 4,
-          "z": 6,
-          "content": "06",
-          "runs": [
-            {
-              "text": "06"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "numeric",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
         {
           "id": "freight-title",
           "type": "text",
@@ -2737,6 +2881,180 @@
               "text": "资料来源：本地财务系统（示例）"
             }
           ]
+        },
+        {
+          "id": "finance-freight--chrome-rail",
+          "type": "box",
+          "name": "页面侧轨",
+          "x": 0,
+          "y": 0,
+          "w": 8,
+          "h": 210,
+          "z": 12,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-freight--chrome-rail-accent",
+          "type": "box",
+          "name": "侧轨强调",
+          "x": 0,
+          "y": 22,
+          "w": 8,
+          "h": 22,
+          "z": 13,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail-accent",
+          "style": {
+            "background": "accent"
+          }
+        },
+        {
+          "id": "finance-freight--header-logo",
+          "type": "image",
+          "name": "页眉 Logo",
+          "x": 13,
+          "y": 5,
+          "w": 17,
+          "h": 11,
+          "z": 14,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-logo",
+          "assetId": "builtin-cosco-logo-color-v1",
+          "style": {
+            "background": "transparent"
+          }
+        },
+        {
+          "id": "finance-freight--header-section",
+          "type": "text",
+          "name": "页眉章节",
+          "x": 35,
+          "y": 7,
+          "w": 246,
+          "h": 6,
+          "z": 15,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-section",
+          "role": "header-right",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "primary",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "right"
+          },
+          "content": "收入与结构分析",
+          "runs": [
+            {
+              "text": "收入与结构分析"
+            }
+          ]
+        },
+        {
+          "id": "finance-freight--header-rule",
+          "type": "divider",
+          "name": "页眉线",
+          "x": 13,
+          "y": 18,
+          "w": 268,
+          "h": 0.5,
+          "z": 16,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-rule",
+          "role": "header-rule",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-freight--footer-organization",
+          "type": "text",
+          "name": "页脚机构",
+          "x": 13,
+          "y": 201,
+          "w": 92,
+          "h": 5,
+          "z": 17,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-organization",
+          "role": "footer-left",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0
+          },
+          "content": "示例航运企业",
+          "runs": [
+            {
+              "text": "示例航运企业"
+            }
+          ]
+        },
+        {
+          "id": "finance-freight--footer-confidentiality",
+          "type": "text",
+          "name": "页脚密级",
+          "x": 185,
+          "y": 201,
+          "w": 78,
+          "h": 5,
+          "z": 18,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-confidentiality",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "align": "right"
+          },
+          "content": "内部资料 注意保密",
+          "runs": [
+            {
+              "text": "内部资料 注意保密"
+            }
+          ]
+        },
+        {
+          "id": "finance-freight--footer-page",
+          "type": "text",
+          "name": "页码",
+          "x": 0,
+          "y": 195,
+          "w": 8,
+          "h": 7,
+          "z": 19,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-page",
+          "role": "footer-page-number",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "numeric",
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "center"
+          },
+          "content": "06",
+          "runs": [
+            {
+              "text": "06"
+            }
+          ]
         }
       ]
     },
@@ -2747,140 +3065,6 @@
       "master": "data",
       "orientation": "landscape",
       "elements": [
-        {
-          "id": "finance-cost-overview--header-left",
-          "role": "header-left",
-          "type": "text",
-          "name": "页眉机构",
-          "x": 18,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 1,
-          "content": "示例航运企业",
-          "runs": [
-            {
-              "text": "示例航运企业"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-cost-overview--header-right",
-          "role": "header-right",
-          "type": "text",
-          "name": "页眉章节",
-          "x": 158.94,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 2,
-          "content": "成本与盈利分析",
-          "runs": [
-            {
-              "text": "成本与盈利分析"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
-        {
-          "id": "finance-cost-overview--header-rule",
-          "role": "header-rule",
-          "type": "divider",
-          "name": "页眉线",
-          "x": 18,
-          "y": 13,
-          "w": 261,
-          "h": 0.25,
-          "z": 3,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-cost-overview--footer-rule",
-          "role": "footer-rule",
-          "type": "divider",
-          "name": "页脚线",
-          "x": 18,
-          "y": 201,
-          "w": 261,
-          "h": 0.25,
-          "z": 4,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-cost-overview--footer-left",
-          "role": "footer-left",
-          "type": "text",
-          "name": "页脚密级",
-          "x": 18,
-          "y": 203,
-          "w": 187.92,
-          "h": 4,
-          "z": 5,
-          "content": "内部资料 注意保密",
-          "runs": [
-            {
-              "text": "内部资料 注意保密"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-cost-overview--footer-page-number",
-          "role": "footer-page-number",
-          "type": "text",
-          "name": "页码",
-          "x": 232.01999999999998,
-          "y": 203,
-          "w": 46.98,
-          "h": 4,
-          "z": 6,
-          "content": "07",
-          "runs": [
-            {
-              "text": "07"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "numeric",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
         {
           "id": "cost-overview-title",
           "type": "text",
@@ -3275,6 +3459,180 @@
               "text": "资料来源：本地财务系统（示例）"
             }
           ]
+        },
+        {
+          "id": "finance-cost-overview--chrome-rail",
+          "type": "box",
+          "name": "页面侧轨",
+          "x": 0,
+          "y": 0,
+          "w": 8,
+          "h": 210,
+          "z": 21,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-cost-overview--chrome-rail-accent",
+          "type": "box",
+          "name": "侧轨强调",
+          "x": 0,
+          "y": 22,
+          "w": 8,
+          "h": 22,
+          "z": 22,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail-accent",
+          "style": {
+            "background": "accent"
+          }
+        },
+        {
+          "id": "finance-cost-overview--header-logo",
+          "type": "image",
+          "name": "页眉 Logo",
+          "x": 13,
+          "y": 5,
+          "w": 17,
+          "h": 11,
+          "z": 23,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-logo",
+          "assetId": "builtin-cosco-logo-color-v1",
+          "style": {
+            "background": "transparent"
+          }
+        },
+        {
+          "id": "finance-cost-overview--header-section",
+          "type": "text",
+          "name": "页眉章节",
+          "x": 35,
+          "y": 7,
+          "w": 246,
+          "h": 6,
+          "z": 24,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-section",
+          "role": "header-right",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "primary",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "right"
+          },
+          "content": "成本与盈利分析",
+          "runs": [
+            {
+              "text": "成本与盈利分析"
+            }
+          ]
+        },
+        {
+          "id": "finance-cost-overview--header-rule",
+          "type": "divider",
+          "name": "页眉线",
+          "x": 13,
+          "y": 18,
+          "w": 268,
+          "h": 0.5,
+          "z": 25,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-rule",
+          "role": "header-rule",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-cost-overview--footer-organization",
+          "type": "text",
+          "name": "页脚机构",
+          "x": 13,
+          "y": 201,
+          "w": 92,
+          "h": 5,
+          "z": 26,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-organization",
+          "role": "footer-left",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0
+          },
+          "content": "示例航运企业",
+          "runs": [
+            {
+              "text": "示例航运企业"
+            }
+          ]
+        },
+        {
+          "id": "finance-cost-overview--footer-confidentiality",
+          "type": "text",
+          "name": "页脚密级",
+          "x": 185,
+          "y": 201,
+          "w": 78,
+          "h": 5,
+          "z": 27,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-confidentiality",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "align": "right"
+          },
+          "content": "内部资料 注意保密",
+          "runs": [
+            {
+              "text": "内部资料 注意保密"
+            }
+          ]
+        },
+        {
+          "id": "finance-cost-overview--footer-page",
+          "type": "text",
+          "name": "页码",
+          "x": 0,
+          "y": 195,
+          "w": 8,
+          "h": 7,
+          "z": 28,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-page",
+          "role": "footer-page-number",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "numeric",
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "center"
+          },
+          "content": "07",
+          "runs": [
+            {
+              "text": "07"
+            }
+          ]
         }
       ]
     },
@@ -3285,140 +3643,6 @@
       "master": "data",
       "orientation": "portrait",
       "elements": [
-        {
-          "id": "finance-cost-detail--header-left",
-          "role": "header-left",
-          "type": "text",
-          "name": "页眉机构",
-          "x": 18,
-          "y": 7,
-          "w": 80.04,
-          "h": 4.5,
-          "z": 1,
-          "content": "示例航运企业",
-          "runs": [
-            {
-              "text": "示例航运企业"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-cost-detail--header-right",
-          "role": "header-right",
-          "type": "text",
-          "name": "页眉章节",
-          "x": 111.96000000000001,
-          "y": 7,
-          "w": 80.04,
-          "h": 4.5,
-          "z": 2,
-          "content": "成本与盈利分析",
-          "runs": [
-            {
-              "text": "成本与盈利分析"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
-        {
-          "id": "finance-cost-detail--header-rule",
-          "role": "header-rule",
-          "type": "divider",
-          "name": "页眉线",
-          "x": 18,
-          "y": 13,
-          "w": 174,
-          "h": 0.25,
-          "z": 3,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-cost-detail--footer-rule",
-          "role": "footer-rule",
-          "type": "divider",
-          "name": "页脚线",
-          "x": 18,
-          "y": 288,
-          "w": 174,
-          "h": 0.25,
-          "z": 4,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-cost-detail--footer-left",
-          "role": "footer-left",
-          "type": "text",
-          "name": "页脚密级",
-          "x": 18,
-          "y": 290,
-          "w": 125.28,
-          "h": 4,
-          "z": 5,
-          "content": "内部资料 注意保密",
-          "runs": [
-            {
-              "text": "内部资料 注意保密"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-cost-detail--footer-page-number",
-          "role": "footer-page-number",
-          "type": "text",
-          "name": "页码",
-          "x": 160.67999999999998,
-          "y": 290,
-          "w": 31.32,
-          "h": 4,
-          "z": 6,
-          "content": "08",
-          "runs": [
-            {
-              "text": "08"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "numeric",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
         {
           "id": "cost-detail-title",
           "type": "text",
@@ -3592,6 +3816,180 @@
               "text": "资料来源：本地财务系统（示例）"
             }
           ]
+        },
+        {
+          "id": "finance-cost-detail--chrome-rail",
+          "type": "box",
+          "name": "页面侧轨",
+          "x": 0,
+          "y": 0,
+          "w": 7,
+          "h": 297,
+          "z": 12,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-cost-detail--chrome-rail-accent",
+          "type": "box",
+          "name": "侧轨强调",
+          "x": 0,
+          "y": 22,
+          "w": 7,
+          "h": 22,
+          "z": 13,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail-accent",
+          "style": {
+            "background": "accent"
+          }
+        },
+        {
+          "id": "finance-cost-detail--header-logo",
+          "type": "image",
+          "name": "页眉 Logo",
+          "x": 13,
+          "y": 5,
+          "w": 17,
+          "h": 11,
+          "z": 14,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-logo",
+          "assetId": "builtin-cosco-logo-color-v1",
+          "style": {
+            "background": "transparent"
+          }
+        },
+        {
+          "id": "finance-cost-detail--header-section",
+          "type": "text",
+          "name": "页眉章节",
+          "x": 35,
+          "y": 7,
+          "w": 159,
+          "h": 6,
+          "z": 15,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-section",
+          "role": "header-right",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "primary",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "right"
+          },
+          "content": "成本与盈利分析",
+          "runs": [
+            {
+              "text": "成本与盈利分析"
+            }
+          ]
+        },
+        {
+          "id": "finance-cost-detail--header-rule",
+          "type": "divider",
+          "name": "页眉线",
+          "x": 13,
+          "y": 18,
+          "w": 181,
+          "h": 0.5,
+          "z": 16,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-rule",
+          "role": "header-rule",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-cost-detail--footer-organization",
+          "type": "text",
+          "name": "页脚机构",
+          "x": 13,
+          "y": 288,
+          "w": 92,
+          "h": 5,
+          "z": 17,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-organization",
+          "role": "footer-left",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0
+          },
+          "content": "示例航运企业",
+          "runs": [
+            {
+              "text": "示例航运企业"
+            }
+          ]
+        },
+        {
+          "id": "finance-cost-detail--footer-confidentiality",
+          "type": "text",
+          "name": "页脚密级",
+          "x": 98,
+          "y": 288,
+          "w": 78,
+          "h": 5,
+          "z": 18,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-confidentiality",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "align": "right"
+          },
+          "content": "内部资料 注意保密",
+          "runs": [
+            {
+              "text": "内部资料 注意保密"
+            }
+          ]
+        },
+        {
+          "id": "finance-cost-detail--footer-page",
+          "type": "text",
+          "name": "页码",
+          "x": 0,
+          "y": 282,
+          "w": 7,
+          "h": 7,
+          "z": 19,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-page",
+          "role": "footer-page-number",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "numeric",
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "center"
+          },
+          "content": "08",
+          "runs": [
+            {
+              "text": "08"
+            }
+          ]
         }
       ]
     },
@@ -3602,140 +4000,6 @@
       "master": "data",
       "orientation": "landscape",
       "elements": [
-        {
-          "id": "finance-admin--header-left",
-          "role": "header-left",
-          "type": "text",
-          "name": "页眉机构",
-          "x": 18,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 1,
-          "content": "示例航运企业",
-          "runs": [
-            {
-              "text": "示例航运企业"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-admin--header-right",
-          "role": "header-right",
-          "type": "text",
-          "name": "页眉章节",
-          "x": 158.94,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 2,
-          "content": "管理与财务费用",
-          "runs": [
-            {
-              "text": "管理与财务费用"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
-        {
-          "id": "finance-admin--header-rule",
-          "role": "header-rule",
-          "type": "divider",
-          "name": "页眉线",
-          "x": 18,
-          "y": 13,
-          "w": 261,
-          "h": 0.25,
-          "z": 3,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-admin--footer-rule",
-          "role": "footer-rule",
-          "type": "divider",
-          "name": "页脚线",
-          "x": 18,
-          "y": 201,
-          "w": 261,
-          "h": 0.25,
-          "z": 4,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-admin--footer-left",
-          "role": "footer-left",
-          "type": "text",
-          "name": "页脚密级",
-          "x": 18,
-          "y": 203,
-          "w": 187.92,
-          "h": 4,
-          "z": 5,
-          "content": "内部资料 注意保密",
-          "runs": [
-            {
-              "text": "内部资料 注意保密"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-admin--footer-page-number",
-          "role": "footer-page-number",
-          "type": "text",
-          "name": "页码",
-          "x": 232.01999999999998,
-          "y": 203,
-          "w": 46.98,
-          "h": 4,
-          "z": 6,
-          "content": "09",
-          "runs": [
-            {
-              "text": "09"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "numeric",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
         {
           "id": "admin-title",
           "type": "text",
@@ -4257,6 +4521,180 @@
               "text": "资料来源：本地财务系统（示例）"
             }
           ]
+        },
+        {
+          "id": "finance-admin--chrome-rail",
+          "type": "box",
+          "name": "页面侧轨",
+          "x": 0,
+          "y": 0,
+          "w": 8,
+          "h": 210,
+          "z": 24,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-admin--chrome-rail-accent",
+          "type": "box",
+          "name": "侧轨强调",
+          "x": 0,
+          "y": 22,
+          "w": 8,
+          "h": 22,
+          "z": 25,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail-accent",
+          "style": {
+            "background": "accent"
+          }
+        },
+        {
+          "id": "finance-admin--header-logo",
+          "type": "image",
+          "name": "页眉 Logo",
+          "x": 13,
+          "y": 5,
+          "w": 17,
+          "h": 11,
+          "z": 26,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-logo",
+          "assetId": "builtin-cosco-logo-color-v1",
+          "style": {
+            "background": "transparent"
+          }
+        },
+        {
+          "id": "finance-admin--header-section",
+          "type": "text",
+          "name": "页眉章节",
+          "x": 35,
+          "y": 7,
+          "w": 246,
+          "h": 6,
+          "z": 27,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-section",
+          "role": "header-right",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "primary",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "right"
+          },
+          "content": "管理与财务费用",
+          "runs": [
+            {
+              "text": "管理与财务费用"
+            }
+          ]
+        },
+        {
+          "id": "finance-admin--header-rule",
+          "type": "divider",
+          "name": "页眉线",
+          "x": 13,
+          "y": 18,
+          "w": 268,
+          "h": 0.5,
+          "z": 28,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-rule",
+          "role": "header-rule",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-admin--footer-organization",
+          "type": "text",
+          "name": "页脚机构",
+          "x": 13,
+          "y": 201,
+          "w": 92,
+          "h": 5,
+          "z": 29,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-organization",
+          "role": "footer-left",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0
+          },
+          "content": "示例航运企业",
+          "runs": [
+            {
+              "text": "示例航运企业"
+            }
+          ]
+        },
+        {
+          "id": "finance-admin--footer-confidentiality",
+          "type": "text",
+          "name": "页脚密级",
+          "x": 185,
+          "y": 201,
+          "w": 78,
+          "h": 5,
+          "z": 30,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-confidentiality",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "align": "right"
+          },
+          "content": "内部资料 注意保密",
+          "runs": [
+            {
+              "text": "内部资料 注意保密"
+            }
+          ]
+        },
+        {
+          "id": "finance-admin--footer-page",
+          "type": "text",
+          "name": "页码",
+          "x": 0,
+          "y": 195,
+          "w": 8,
+          "h": 7,
+          "z": 31,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-page",
+          "role": "footer-page-number",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "numeric",
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "center"
+          },
+          "content": "09",
+          "runs": [
+            {
+              "text": "09"
+            }
+          ]
         }
       ]
     },
@@ -4267,140 +4705,6 @@
       "master": "data",
       "orientation": "landscape",
       "elements": [
-        {
-          "id": "finance-history--header-left",
-          "role": "header-left",
-          "type": "text",
-          "name": "页眉机构",
-          "x": 18,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 1,
-          "content": "示例航运企业",
-          "runs": [
-            {
-              "text": "示例航运企业"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-history--header-right",
-          "role": "header-right",
-          "type": "text",
-          "name": "页眉章节",
-          "x": 158.94,
-          "y": 7,
-          "w": 120.06,
-          "h": 4.5,
-          "z": 2,
-          "content": "长期观察",
-          "runs": [
-            {
-              "text": "长期观察"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
-        {
-          "id": "finance-history--header-rule",
-          "role": "header-rule",
-          "type": "divider",
-          "name": "页眉线",
-          "x": 18,
-          "y": 13,
-          "w": 261,
-          "h": 0.25,
-          "z": 3,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-history--footer-rule",
-          "role": "footer-rule",
-          "type": "divider",
-          "name": "页脚线",
-          "x": 18,
-          "y": 201,
-          "w": 261,
-          "h": 0.25,
-          "z": 4,
-          "content": "",
-          "style": {
-            "background": "line"
-          }
-        },
-        {
-          "id": "finance-history--footer-left",
-          "role": "footer-left",
-          "type": "text",
-          "name": "页脚密级",
-          "x": 18,
-          "y": 203,
-          "w": 187.92,
-          "h": 4,
-          "z": 5,
-          "content": "内部资料 注意保密",
-          "runs": [
-            {
-              "text": "内部资料 注意保密"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "body",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "left"
-          }
-        },
-        {
-          "id": "finance-history--footer-page-number",
-          "role": "footer-page-number",
-          "type": "text",
-          "name": "页码",
-          "x": 232.01999999999998,
-          "y": 203,
-          "w": 46.98,
-          "h": 4,
-          "z": 6,
-          "content": "10",
-          "runs": [
-            {
-              "text": "10"
-            }
-          ],
-          "style": {
-            "fontSize": 8,
-            "fontSlot": "numeric",
-            "color": "muted",
-            "background": "transparent",
-            "lineHeight": 1.2,
-            "padding": 0,
-            "align": "right"
-          }
-        },
         {
           "id": "history-title",
           "type": "text",
@@ -4566,9 +4870,183 @@
               "text": "资料来源：本地财务系统（示例）"
             }
           ]
+        },
+        {
+          "id": "finance-history--chrome-rail",
+          "type": "box",
+          "name": "页面侧轨",
+          "x": 0,
+          "y": 0,
+          "w": 8,
+          "h": 210,
+          "z": 12,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-history--chrome-rail-accent",
+          "type": "box",
+          "name": "侧轨强调",
+          "x": 0,
+          "y": 22,
+          "w": 8,
+          "h": 22,
+          "z": 13,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "chrome-rail-accent",
+          "style": {
+            "background": "accent"
+          }
+        },
+        {
+          "id": "finance-history--header-logo",
+          "type": "image",
+          "name": "页眉 Logo",
+          "x": 13,
+          "y": 5,
+          "w": 17,
+          "h": 11,
+          "z": 14,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-logo",
+          "assetId": "builtin-cosco-logo-color-v1",
+          "style": {
+            "background": "transparent"
+          }
+        },
+        {
+          "id": "finance-history--header-section",
+          "type": "text",
+          "name": "页眉章节",
+          "x": 35,
+          "y": 7,
+          "w": 246,
+          "h": 6,
+          "z": 15,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-section",
+          "role": "header-right",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "primary",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "right"
+          },
+          "content": "长期观察",
+          "runs": [
+            {
+              "text": "长期观察"
+            }
+          ]
+        },
+        {
+          "id": "finance-history--header-rule",
+          "type": "divider",
+          "name": "页眉线",
+          "x": 13,
+          "y": 18,
+          "w": 268,
+          "h": 0.5,
+          "z": 16,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "header-rule",
+          "role": "header-rule",
+          "style": {
+            "background": "primary"
+          }
+        },
+        {
+          "id": "finance-history--footer-organization",
+          "type": "text",
+          "name": "页脚机构",
+          "x": 13,
+          "y": 201,
+          "w": 92,
+          "h": 5,
+          "z": 17,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-organization",
+          "role": "footer-left",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0
+          },
+          "content": "示例航运企业",
+          "runs": [
+            {
+              "text": "示例航运企业"
+            }
+          ]
+        },
+        {
+          "id": "finance-history--footer-confidentiality",
+          "type": "text",
+          "name": "页脚密级",
+          "x": 185,
+          "y": 201,
+          "w": 78,
+          "h": 5,
+          "z": 18,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-confidentiality",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "body",
+            "color": "muted",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "align": "right"
+          },
+          "content": "内部资料 注意保密",
+          "runs": [
+            {
+              "text": "内部资料 注意保密"
+            }
+          ]
+        },
+        {
+          "id": "finance-history--footer-page",
+          "type": "text",
+          "name": "页码",
+          "x": 0,
+          "y": 195,
+          "w": 8,
+          "h": 7,
+          "z": 19,
+          "presetId": "chrome-template:brand-rail",
+          "presetSlot": "footer-page",
+          "role": "footer-page-number",
+          "style": {
+            "fontSize": 8,
+            "fontSlot": "numeric",
+            "color": "white",
+            "background": "transparent",
+            "lineHeight": 1.2,
+            "padding": 0,
+            "fontWeight": 700,
+            "align": "center"
+          },
+          "content": "10",
+          "runs": [
+            {
+              "text": "10"
+            }
+          ]
         }
       ]
     }
   ],
-  "updatedAt": "2026-08-16T00:00:00.000Z"
+  "updatedAt": "2026-08-16T08:00:00.000Z"
 }
